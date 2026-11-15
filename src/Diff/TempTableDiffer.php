@@ -141,10 +141,12 @@ class TempTableDiffer implements ReferenceIndex
     {
         // Laravel adds a SQL Server primary key with a separate ALTER TABLE that misses the "#"
         // name, so the table is created in one statement with an inline (unnamed) key instead.
+        // It runs unprepared: a "#" table created inside a prepared statement is dropped as soon
+        // as that statement ends, while a direct batch keeps it for the whole session.
         if ($this->isSqlServer()) {
             $grammar = $this->connection->getQueryGrammar();
 
-            $this->connection->statement(sprintf(
+            $this->connection->unprepared(sprintf(
                 'create table %s (%s char(32) not null primary key)',
                 $grammar->wrap($this->sqlServerName()),
                 $grammar->wrap('hash'),
