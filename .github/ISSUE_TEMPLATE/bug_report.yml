@@ -1,0 +1,93 @@
+name: Bug report
+description: Something doesn't work the way the README says.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If the bug could delete or trash a file that's still in use, please don't post it here. Report it privately as described in [SECURITY.md](https://github.com/eramitgupta/laravel-orphan-storage/blob/main/SECURITY.md).
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: Run `composer show erag/laravel-orphan-storage`.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: laravel-version
+    attributes:
+      label: Laravel version
+      placeholder: "13.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "8.4.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: disk
+    attributes:
+      label: Storage disk
+      description: Which kind of disk is affected?
+      options:
+        - local
+        - public
+        - S3
+        - MinIO
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant config
+      description: The `disks` and `sources` parts of `config/orphan-storage.php`, plus any options you changed. Remove secrets.
+      render: php
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The exact commands you ran and the data involved.
+      placeholder: |
+        1. Store `avatars/jane.jpg` and save it in `users.avatar`
+        2. Run `php artisan orphan:scan`
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Paste the command output. The output of `php artisan orphan:explain {path}` for an affected file helps most.
+      render: shell
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dry-run
+    attributes:
+      label: Dry run
+      options:
+        - label: I ran the command in dry-run mode first (`orphan:clean` without `--force`).
+          required: true
