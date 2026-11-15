@@ -2,7 +2,7 @@
 
 # Laravel Orphan Storage
 
-Find and delete unused files in Laravel storage: orphaned uploads that no database row points to any more.
+Find and safely delete unused files in Laravel storage: old uploads that no database row points to any more.
 
 [![Packagist License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/eramitgupta/laravel-orphan-storage/blob/main/LICENSE.md)
 [![Latest Stable Version](https://img.shields.io/packagist/v/erag/laravel-orphan-storage?label=Stable)](https://packagist.org/packages/erag/laravel-orphan-storage)
@@ -16,9 +16,28 @@ Find and delete unused files in Laravel storage: orphaned uploads that no databa
   <img src="https://raw.githubusercontent.com/eramitgupta/laravel-orphan-storage/main/art/demo.gif" alt="Terminal demo of Laravel Orphan Storage: php artisan orphan:scan finds 20 unused images (6.8 MB) out of 43 files, orphan:clean lists them in a dry run, orphan:clean --force moves them to the trash, and a second scan shows 0 orphans" width="900">
 </p>
 
-Laravel Orphan Storage is a storage cleanup package for Laravel 12 and Laravel 13. When a user replaces their avatar or deletes a comment, the old image usually stays on the disk and keeps costing money. The package compares your storage with the paths your database references, finds the orphaned files and moves them to a trash folder you can restore from. It works on local disks, S3, MinIO and other S3-compatible storage.
+## What is Laravel Orphan Storage?
+
+Every Laravel app that accepts uploads collects dead files. A user changes their avatar, an admin deletes a product, a comment with images is removed, and the old files stay on the disk. On S3 or MinIO you keep paying for them, and on a local disk they slowly fill the server.
+
+Laravel Orphan Storage finds those files for you. It lists the files on your disks, reads every database column that stores a file (a path, a JSON list, rich text or a full URL) and reports the files that nothing references any more. These are your orphaned files.
+
+Then it cleans them up carefully. A clean is a dry run until you add `--force`, cleaned files go to a trash folder you can restore from, recent uploads are skipped, and the clean stops if it would remove a suspicious share of a disk.
+
+It's a set of Artisan commands for Laravel 12 and Laravel 13, with no migrations, no tables and no UI. It works on `local` and `public` disks, Amazon S3, MinIO and other S3-compatible storage.
 
 In the demo above, 20 of 43 images turn out to be unused, and cleaning them frees 6.8 MB.
+
+## Installation
+
+Install the package with Composer, then publish the config file:
+
+```bash
+composer require erag/laravel-orphan-storage
+php artisan vendor:publish --tag=orphan-storage-config
+```
+
+Laravel registers the package automatically. The second command creates `config/orphan-storage.php`, where you list your disks and the columns that point to files, as shown in the [quick start](#quick-start) below.
 
 ## Features
 
@@ -62,16 +81,9 @@ You can add your own column types for editors like Editor.js. [See sources in th
 | 12.x | 8.2, 8.3, 8.4 |
 | 13.x | 8.3, 8.4 |
 
-## Installation and quick start
+## Quick start
 
-Install the package and publish the config file:
-
-```bash
-composer require erag/laravel-orphan-storage
-php artisan vendor:publish --tag=orphan-storage-config
-```
-
-In `config/orphan-storage.php`, tell it where files live and which columns point to them:
+After installing, open `config/orphan-storage.php` and tell it where files live and which columns point to them:
 
 ```php
 'disks' => [
