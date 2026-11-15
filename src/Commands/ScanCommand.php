@@ -1,0 +1,108 @@
+<?php
+
+namespace Erag\OrphanStorage\Commands;
+
+use Erag\OrphanStorage\Commands\Concerns\InteractsWithOrphanOptions;
+use Erag\OrphanStorage\OrphanStorage;
+use Erag\OrphanStorage\Scanner\FileInfo;
+use Erag\OrphanStorage\Support\Bytes;
+use Erag\OrphanStorage\Support\CsvWriter;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Date;
+use InvalidArgumentException;
+use RuntimeException;
+
+class ScanCommand extends Command
+{
+    use InteractsWithOrphanOptions;
+
+    protected $signature = 'orphan:scan
+        {--disk=* : Only scan these disks}
+        {--dir=* : Only scan these directories}
+        {--older-than= : Replace the grace period, e.g. 90m, 48h or 7d}
+        {--json : Print the summary as JSON}
+        {--export= : Export the orphans to a file (csv)}
+        {--output= : Where to write the export (defaults to export_path)}
+        {--queue : Run the scan on the queue}';
+
+    protected $description = 'Find storage files that no database row references.';
+
+    public function handle(OrphanStorage $orphanStorage): int
+    {
+        $writer = null;
+
+        try {
+            $options = $this->scanOptions();
+
+            if ($this->option('queue')) {
+                $orphanStorage->queueScan($options);
+                $this->components->info('The scan was queued. Listen for the OrphanScanCompleted event to read the report.');
+
+                return self::SUCCESS;
+            }
+
+            $writer = $this->exportWriter();
+            $verbose = $this->output->isVerbose() && ! $this->option('json');
+
+            $report = $orphanStorage->scan($options, function (FileInfo $file, ?string $reasonToKeep) use ($writer, $verbose): void {
+                $writer?->write($file, $reasonToKeep);
+
+                if ($verbose) {
+                    $this->line(sprintf('  %s:%s <fg=gray>%s</>', $file->disk, $file->path, $reasonToKeep ?? 'cleanable'));
+                }
+            });
+        } catch (InvalidArgumentException|RuntimeException $exception) {
+            $this->components->error($exception->getMessage());
+
+            return self::FAILURE;
+        } finally {
+            $writer?->close();
+        }
+
+        if ($this->option('json')) {
+            $this->line((string) json_encode($report->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+            return self::SUCCESS;
+        }
+
+        $this->renderReport($report);
+
+        $totals = $report->totals();
+
+        if ($writer !== null) {
+            $this->components->info(sprintf('Exported %s orphans to %s', number_format($writer->rows), $writer->path));
+        }
+
+        if ($totals['cleanable'] > 0) {
+            $this->components->warn(sprintf(
+                '%s orphaned files (%s) can be cleaned. Preview with: php artisan orphan:clean',
+                number_format($totals['cleanable']),
+                Bytes::format($totals['reclaimable_bytes']),
+            ));
+        } else {
+            $this->components->info('No orphaned files to clean.');
+        }
+
+        return self::SUCCESS;
+    }
+
+    protected function exportWriter(): ?CsvWriter
+    {
+        $format = $this->option('export');
+
+        if ($format === null || $format === '') {
+            return null;
+        }
+
+        if (strtolower((string) $format) !== 'csv') {
+            throw new InvalidArgumentException("Unsupported export format [{$format}]. Use --export=csv.");
+        }
+
+        $output = $this->option('output');
+        $path = is_string($output) && $output !== ''
+            ? $output
+            : rtrim((string) config('orphan-storage.export_path', storage_path('orphan-storage')), '/').'/orphans-'.Date::now()->format('Y-m-d_His').'.csv';
+
+        return new CsvWriter($path);
+    }
+}
