@@ -1,0 +1,91 @@
+<?php
+
+namespace Erag\OrphanStorage\Actions;
+
+use Erag\OrphanStorage\Scanner\FileInfo;
+use Erag\OrphanStorage\Scanner\StorageScanner;
+use Erag\OrphanStorage\Support\Data\ActionResult;
+use Erag\OrphanStorage\Support\Data\TrashedFile;
+use Erag\OrphanStorage\Support\Trash;
+use Generator;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Support\Facades\Date;
+
+/**
+ * Permanently deletes trash buckets older than the retention period.
+ *
+ * Only the files that were listed are deleted. The bucket folder itself
+ * is removed afterwards only when every delete succeeded and nothing new
+ * arrived in it meanwhile.
+ */
+class PurgeTrash
+{
+    public function __construct(
+        protected Trash $trash,
+        protected DeleteFiles $delete,
+        protected FilesystemFactory $filesystems,
+        protected StorageScanner $scanner,
+    ) {}
+
+    /**
+     * @param  int|null  $retentionDays  Null uses `trash.retention_days`.
+     * @param  bool  $all  Purge every bucket, including today's.
+     * @param  bool  $dryRun  Count what would be purged without deleting.
+     */
+    public function handle(?string $disk = null, ?int $retentionDays = null, bool $all = false, bool $dryRun = false): ActionResult
+    {
+        $result = new ActionResult('purge');
+        $cutoff = Date::today()->subDays($retentionDays ?? $this->trash->retentionDays())->format('Y-m-d');
+
+        foreach ($disk !== null ? [$disk] : $this->trash->sourceDisks() as $sourceDisk) {
+            foreach ($this->trash->buckets($sourceDisk) as $bucket) {
+                if (! $all && $this->trash->bucketDate($bucket) >= $cutoff) {
+                    continue;
+                }
+
+                if ($dryRun) {
+                    foreach ($this->trash->bucketEntries($sourceDisk, $bucket) as $entry) {
+                        $result->succeeded($entry->trashDisk, $entry->trashPath, $entry->size);
+                    }
+
+                    continue;
+                }
+
+                $purged = $this->delete->handle($this->files($this->trash->bucketEntries($sourceDisk, $bucket)));
+                $result->merge($purged);
+
+                if ($purged->failed === 0) {
+                    $this->removeIfEmpty($sourceDisk, $bucket);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Remove the (now empty) bucket folder, e.g. leftover local directories.
+     */
+    protected function removeIfEmpty(string $sourceDisk, string $bucket): void
+    {
+        $trashDisk = $this->trash->diskFor($sourceDisk);
+        $folder = $this->trash->root($sourceDisk).'/'.$bucket;
+
+        foreach ($this->scanner->list($trashDisk, $folder) as $file) {
+            return;
+        }
+
+        $this->filesystems->disk($trashDisk)->deleteDirectory($folder);
+    }
+
+    /**
+     * @param  iterable<int, TrashedFile>  $entries
+     * @return Generator<int, FileInfo>
+     */
+    protected function files(iterable $entries): Generator
+    {
+        foreach ($entries as $entry) {
+            yield new FileInfo($entry->trashDisk, $entry->trashPath, $entry->size);
+        }
+    }
+}
