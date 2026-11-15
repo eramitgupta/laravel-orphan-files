@@ -203,7 +203,8 @@ jobs:
         run: vendor/bin/pest --group=database
 
   sqlsrv:
-    runs-on: ubuntu-latest
+    # Pinned so the Microsoft ODBC apt repository below matches the runner's Ubuntu release.
+    runs-on: ubuntu-24.04
 
     name: DB sqlsrv
 
@@ -235,6 +236,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+
+      # pdo_sqlsrv needs the Microsoft ODBC Driver for SQL Server, which the runner image doesn't ship.
+      - name: Install Microsoft ODBC Driver 18
+        run: |
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl -fsSL https://packages.microsoft.com/config/ubuntu/24.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
