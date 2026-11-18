@@ -6,7 +6,9 @@ Find the uploaded files your Laravel app no longer uses, and clean them up safel
 
 [![Packagist License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/eramitgupta/laravel-orphan-files/blob/main/LICENSE.md)
 [![Latest Stable Version](https://img.shields.io/packagist/v/erag/laravel-orphan-files?label=Stable)](https://packagist.org/packages/erag/laravel-orphan-files)
-[![Total Downloads](https://img.shields.io/packagist/dt/erag/laravel-orphan-files.svg?label=Downloads)](https://packagist.org/packages/erag/laravel-orphan-files)
+[![Laravel](https://img.shields.io/badge/Laravel-12.x%20%7C%2013.x-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net)
+[![Tests](https://img.shields.io/github/actions/workflow/status/eramitgupta/laravel-orphan-files/tests.yml?branch=main&label=Tests)](https://github.com/eramitgupta/laravel-orphan-files/actions/workflows/tests.yml)
 
 [Documentation](https://erag.in/laravel-orphan-files/) · [Packagist](https://packagist.org/packages/erag/laravel-orphan-files)
 
