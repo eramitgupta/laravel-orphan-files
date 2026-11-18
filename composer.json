@@ -1,7 +1,7 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "erag/laravel-orphan-files",
-    "description": "Find and clean up unused, orphaned files in Laravel storage (local, S3, MinIO) that no database row uses, with a dry run and a restorable trash.",
+    "description": "Find the uploaded files your Laravel app no longer uses, like old avatars and images from deleted posts, and clean them up safely with a preview and a restorable trash. Works with local disks, S3, MinIO and RustFS.",
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/eramitgupta/laravel-orphan-files",
