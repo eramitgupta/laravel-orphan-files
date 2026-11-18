@@ -1,7 +1,7 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "erag/laravel-orphan-storage",
-    "description": "Find and delete unused, orphaned files in Laravel storage (local, public, S3, MinIO) that no database row references. Dry run by default, with a restorable trash and safety checks.",
+    "description": "Find and clean up unused, orphaned files in Laravel storage (local, S3, MinIO) that no database row uses, with a dry run and a restorable trash.",
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/eramitgupta/laravel-orphan-storage",
@@ -17,6 +17,7 @@
         "unused uploads",
         "s3",
         "minio",
+        "rustfs",
         "filesystem",
         "disk space",
         "artisan"
@@ -49,7 +50,7 @@
         "pestphp/pest": "^3.0|^4.0|^5.0"
     },
     "suggest": {
-        "league/flysystem-aws-s3-v3": "Required to scan and batch-delete files on S3, MinIO and other S3-compatible disks."
+        "league/flysystem-aws-s3-v3": "Required to scan and batch-delete files on S3, MinIO, RustFS and other S3-compatible disks."
     },
     "autoload": {
         "psr-4": {

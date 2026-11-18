@@ -1,6 +1,6 @@
 ## Orphan Storage (erag/laravel-orphan-storage)
 
-This package finds files on Laravel disks (local, public, S3, MinIO) that no database row references. A clean moves them to a trash folder by default, where they can be restored. It only has Artisan commands, and no tables or migrations of its own.
+This package finds files on Laravel disks (local, public, S3, and S3-compatible stores such as MinIO and RustFS) that no database row references. A clean moves them to a trash folder by default, where they can be restored. It only has Artisan commands, and no tables or migrations of its own.
 
 ### Installing
 

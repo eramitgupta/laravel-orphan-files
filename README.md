@@ -2,7 +2,7 @@
 
 # Laravel Orphan Storage
 
-Find and safely delete unused files in Laravel storage: old uploads that no database row points to any more.
+Find and safely delete unused files in Laravel storage that no database row points to.
 
 [![Packagist License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/eramitgupta/laravel-orphan-storage/blob/main/LICENSE.md)
 [![Latest Stable Version](https://img.shields.io/packagist/v/erag/laravel-orphan-storage?label=Stable)](https://packagist.org/packages/erag/laravel-orphan-storage)
@@ -12,21 +12,19 @@ Find and safely delete unused files in Laravel storage: old uploads that no data
 
 </div>
 
+Users replace avatars, edit posts and delete comments, but the old uploads stay on the disk or S3 bucket until the bill grows.
+
+Laravel Orphan Storage reads the disks you choose, collects every file path your database still uses (path, JSON, HTML and URL columns) and finds the orphaned files left behind.
+
+Storage cleanup stays safe: nothing changes until `--force`, files go to a restorable trash, recent uploads are skipped, and odd results stop the run. Just Artisan commands, no migrations or UI.
+
+In the demo below, a MinIO bucket holds 320 images (1.27 GB), and 160 of them (593 MB) are unused.
+
+Built for apps with user uploads, comment images, rich-text editors, product galleries or growing storage on S3, MinIO or RustFS.
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/eramitgupta/laravel-orphan-storage/main/art/demo.gif" alt="Terminal demo of Laravel Orphan Storage: php artisan orphan:scan finds 20 unused images (6.8 MB) out of 43 files, orphan:clean lists them in a dry run, orphan:clean --force moves them to the trash, and a second scan shows 0 orphans" width="900">
+  <img src="https://raw.githubusercontent.com/eramitgupta/laravel-orphan-storage/main/art/demo.gif" alt="Terminal demo of Laravel Orphan Storage on a MinIO bucket with 320 images (1.27 GB): php artisan orphan:scan finds 160 unused images (593.1 MB), orphan:clean lists them in a dry run, orphan:clean --force moves them to the trash, orphan:purge-trash --all deletes them, and a second scan shows 0 orphans" width="900">
 </p>
-
-## What is Laravel Orphan Storage?
-
-Every Laravel app that accepts uploads collects dead files. A user changes their avatar, an admin deletes a product, a comment with images is removed, and the old files stay on the disk. On S3 or MinIO you keep paying for them, and on a local disk they slowly fill the server.
-
-Laravel Orphan Storage finds those files for you. It lists the files on your disks, reads every database column that stores a file (a path, a JSON list, rich text or a full URL) and reports the files that nothing references any more. These are your orphaned files.
-
-Then it cleans them up carefully. A clean is a dry run until you add `--force`, cleaned files go to a trash folder you can restore from, recent uploads are skipped, and the clean stops if it would remove a suspicious share of a disk.
-
-It's a set of Artisan commands for Laravel 12 and Laravel 13, with no migrations, no tables and no UI. It works on `local` and `public` disks, Amazon S3, MinIO and other S3-compatible storage.
-
-In the demo above, 20 of 43 images turn out to be unused, and cleaning them frees 6.8 MB.
 
 ## Installation
 
@@ -41,10 +39,10 @@ Laravel registers the package automatically. `orphan:install` creates `config/or
 
 ## Features
 
-- Works on any Laravel disk: `local`, `public`, Amazon S3, MinIO and other S3-compatible storage.
+- Works on any Laravel disk: `local`, `public`, Amazon S3 and S3-compatible storage, including MinIO and RustFS.
 - Streams storage listings, so a bucket with millions of objects doesn't have to fit in memory.
 - Reads file references from path columns, JSON columns, rich text (HTML or Markdown) and full URLs.
-- Maps `Storage::url()` links, CDN URLs, S3 and MinIO endpoints and signed URLs back to disk paths.
+- Maps `Storage::url()` links, CDN URLs, S3, MinIO and RustFS endpoints and signed URLs back to disk paths.
 - Lets you list columns in the config file, or declare them on a model with the `HasStorageFiles` trait.
 - Keeps soft-deleted rows' files, because global scopes are ignored.
 - Dry run by default: nothing changes until you add `--force`.
@@ -131,9 +129,9 @@ Deleting files is easy to get wrong, so the package is careful by default:
 
 [Running it safely](https://erag.in/laravel-orphan-storage/guides/safety.html)
 
-## Clean up orphaned files on S3 and MinIO
+## Clean up orphaned files on S3, MinIO and RustFS
 
-S3 and MinIO disks work the same way as local ones. Listings are paginated, so large buckets are fine, and deletes go out in batches of 1,000 keys. URLs stored in your database, including CDN domains and signed URLs, are matched back to the right object. [URLs and CDNs in the docs](https://erag.in/laravel-orphan-storage/configuration/urls.html)
+S3 disks work the same way as local ones, and so do S3-compatible stores such as MinIO and RustFS, because they all use Laravel's `s3` driver. Listings are paginated, so large buckets are fine, and deletes go out in batches of 1,000 keys. URLs stored in your database, including CDN domains and signed URLs, are matched back to the right object. [URLs and CDNs in the docs](https://erag.in/laravel-orphan-storage/configuration/urls.html)
 
 ## FAQ
 

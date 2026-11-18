@@ -24,7 +24,7 @@ php artisan orphan:install
 
 `orphan:install` creates `config/orphan-storage.php` and asks before overwriting an existing one. Don't pass `--force` unless the user wants their config replaced with the package defaults.
 
-S3, MinIO and other S3-compatible disks also need `league/flysystem-aws-s3-v3`.
+S3, MinIO, RustFS and other S3-compatible disks also need `league/flysystem-aws-s3-v3`.
 
 ### 2. List where uploads are stored
 
