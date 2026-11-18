@@ -4,6 +4,7 @@ namespace Erag\OrphanStorage;
 
 use Erag\OrphanStorage\Commands\CleanCommand;
 use Erag\OrphanStorage\Commands\ExplainCommand;
+use Erag\OrphanStorage\Commands\InstallCommand;
 use Erag\OrphanStorage\Commands\PurgeTrashCommand;
 use Erag\OrphanStorage\Commands\RestoreCommand;
 use Erag\OrphanStorage\Commands\ScanCommand;
@@ -33,6 +34,7 @@ class OrphanStorageServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                InstallCommand::class,
                 ScanCommand::class,
                 CleanCommand::class,
                 RestoreCommand::class,

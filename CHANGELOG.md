@@ -8,6 +8,7 @@ First release. Needs Laravel 12 or 13 and PHP 8.2 or newer (8.3 on Laravel 13). 
 
 ### Added
 
+- `orphan:install` creates `config/orphan-storage.php`, asks before overwriting an existing one (`--force` skips the question) and prints the next steps.
 - `orphan:scan` reports how many files are referenced, how many are orphans and how much space they use. `--json` and `--export=csv` give you the data.
 - `orphan:clean` trashes or deletes orphans. It's a dry run until you pass `--force`. Also takes `--mode`, `--older-than`, `--limit` and `--force-ratio`.
 - `orphan:restore` moves trashed files back to where they were.

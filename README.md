@@ -30,14 +30,14 @@ In the demo above, 20 of 43 images turn out to be unused, and cleaning them free
 
 ## Installation
 
-Install the package with Composer, then publish the config file:
+Install the package with Composer, then run the install command:
 
 ```bash
 composer require erag/laravel-orphan-storage
-php artisan vendor:publish --tag=orphan-storage-config
+php artisan orphan:install
 ```
 
-Laravel registers the package automatically. The second command creates `config/orphan-storage.php`, where you list your disks and the columns that point to files, as shown in the [quick start](#quick-start) below.
+Laravel registers the package automatically. `orphan:install` creates `config/orphan-storage.php`, where you list your disks and the columns that point to files, and prints the next steps. If the config file already exists, it asks before overwriting it; `--force` overwrites without asking. It never touches your database and creates no migrations. The [quick start](#quick-start) below shows a first setup.
 
 ## Features
 
@@ -109,6 +109,7 @@ php artisan orphan:clean --force   # moves the orphans to the trash
 
 | Command | What it does |
 | --- | --- |
+| `orphan:install` | Publishes `config/orphan-storage.php` and prints the next steps. Asks before overwriting; `--force` skips the question. |
 | `orphan:scan` | Counts files, referenced files and orphans, and shows how much space you'd get back. Can export CSV or print JSON. |
 | `orphan:clean` | Shows what would be cleaned. With `--force` it moves orphans to the trash, or deletes them with `--mode=delete`. |
 | `orphan:restore` | Moves trashed files back to where they were, one file, one folder or everything. |
