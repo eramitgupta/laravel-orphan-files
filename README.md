@@ -2,7 +2,7 @@
 
 # Laravel Orphan Files
 
-Find and safely delete unused files in Laravel storage that no database row points to.
+Find the uploaded files your Laravel app no longer uses, and clean them up safely so they stop filling your disk and your S3 bill.
 
 [![Packagist License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/eramitgupta/laravel-orphan-files/blob/main/LICENSE.md)
 [![Latest Stable Version](https://img.shields.io/packagist/v/erag/laravel-orphan-files?label=Stable)](https://packagist.org/packages/erag/laravel-orphan-files)
@@ -12,15 +12,24 @@ Find and safely delete unused files in Laravel storage that no database row poin
 
 </div>
 
-Users replace avatars, edit posts and delete comments, but the old uploads stay on the disk or S3 bucket until the bill grows.
+## Why you need it
 
-Laravel Orphan Files reads the disks you choose, collects every file path your database still uses (path, JSON, HTML and URL columns) and finds the orphaned files left behind.
+When a user changes their profile photo, deletes a post or removes a comment, the database moves on, but the old file stays in storage. Nothing uses it any more, yet it keeps taking space on your server and adds to your S3 bill every month. These leftover files are called orphaned files, and every app that accepts uploads collects them.
 
-Storage cleanup stays safe: nothing changes until `--force`, files go to a restorable trash, recent uploads are skipped, and odd results stop the run. Just Artisan commands, no migrations or UI.
+## What it does
 
-In the demo below, a MinIO bucket holds 320 images (1.27 GB), and 160 of them (593 MB) are unused.
+Laravel Orphan Files finds those files for you. It looks at every file on the disks you choose, checks your database to see which files are still in use, and lists the ones nothing points to. You can then move them to a trash folder, restore them if you change your mind, or delete them for good.
 
-Built for apps with user uploads, comment images, rich-text editors, product galleries or growing storage on S3, MinIO or RustFS.
+It is careful by default:
+
+- Nothing changes until you add `--force`, so the first run is always a preview.
+- Cleaned files go to a trash folder you can restore from.
+- Recent uploads are skipped (the last 24 hours by default), so a file that is still being saved is never removed.
+- The clean stops if more than 90% of a disk looks unused (by default), because that usually means a config mistake.
+
+It is just a few Artisan commands, with no migrations, no tables and no UI. It works with local disks, Amazon S3 and S3-compatible storage such as MinIO and RustFS, so it fits any app with profile photos, comment images, rich-text editors or product galleries.
+
+In the demo below, a MinIO bucket holds 320 images (1.27 GB), and 160 of them (593 MB) are no longer used.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/eramitgupta/laravel-orphan-files/main/art/demo.gif" alt="Terminal demo of Laravel Orphan Files on a MinIO bucket with 320 images (1.27 GB): php artisan orphan:scan finds 160 unused images (593.1 MB), orphan:clean lists them in a dry run, orphan:clean --force moves them to the trash, orphan:purge-trash --all deletes them, and a second scan shows 0 orphans" width="900">
