@@ -1,12 +1,12 @@
 <?php
 
-namespace Erag\OrphanStorage\Events;
+namespace Erag\OrphanFiles\Events;
 
 /**
  * Dispatched once per batch (`chunk_size` files) deleted permanently, by
  * a clean in delete mode or when the trash is purged.
  */
-class OrphanStorageDeleted
+class OrphanFilesDeleted
 {
     /**
      * @param  list<string>  $paths

@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Normalizers;
+namespace Erag\OrphanFiles\Support\Normalizers;
 
-use Erag\OrphanStorage\Contracts\PathNormalizer;
+use Erag\OrphanFiles\Contracts\PathNormalizer;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Throwable;
@@ -130,7 +130,7 @@ class UrlToPathNormalizer implements PathNormalizer
             $urls = [...$urls, ...$this->s3Endpoints($config, $keyPrefix)];
         }
 
-        foreach ((array) $this->config->get("orphan-storage.url_prefixes.{$disk}", []) as $prefix) {
+        foreach ((array) $this->config->get("orphan-files.url_prefixes.{$disk}", []) as $prefix) {
             if (! is_string($prefix) || $prefix === '') {
                 continue;
             }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Erag\OrphanStorage\Diff;
+namespace Erag\OrphanFiles\Diff;
 
 use Generator;
 

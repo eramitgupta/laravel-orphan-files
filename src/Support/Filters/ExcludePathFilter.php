@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Filters;
+namespace Erag\OrphanFiles\Support\Filters;
 
-use Erag\OrphanStorage\Contracts\FileFilter;
-use Erag\OrphanStorage\Scanner\FileInfo;
+use Erag\OrphanFiles\Contracts\FileFilter;
+use Erag\OrphanFiles\Scanner\FileInfo;
 use Illuminate\Support\Str;
 
 /**

@@ -1,10 +1,10 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Filters;
+namespace Erag\OrphanFiles\Support\Filters;
 
-use Erag\OrphanStorage\Contracts\FileFilter;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Bytes;
+use Erag\OrphanFiles\Contracts\FileFilter;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Bytes;
 
 /**
  * Limits cleanup by file size and extension.

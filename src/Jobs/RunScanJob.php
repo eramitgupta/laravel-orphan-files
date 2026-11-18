@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Jobs;
+namespace Erag\OrphanFiles\Jobs;
 
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Support\Data\ScanOptions;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Support\Data\ScanOptions;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,8 +19,8 @@ class RunScanJob implements ShouldQueue
 
     public function __construct(public ScanOptions $options = new ScanOptions) {}
 
-    public function handle(OrphanStorage $orphanStorage): void
+    public function handle(OrphanFiles $orphanFiles): void
     {
-        $orphanStorage->scan($this->options);
+        $orphanFiles->scan($this->options);
     }
 }

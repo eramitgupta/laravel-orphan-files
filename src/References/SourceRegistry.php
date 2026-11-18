@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\References;
+namespace Erag\OrphanFiles\References;
 
-use Erag\OrphanStorage\Exceptions\InvalidSourceException;
+use Erag\OrphanFiles\Exceptions\InvalidSourceException;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\DatabaseManager;
 
@@ -43,7 +43,7 @@ class SourceRegistry
     {
         $sources = [];
 
-        foreach ((array) $this->config->get('orphan-storage.sources', []) as $index => $definition) {
+        foreach ((array) $this->config->get('orphan-files.sources', []) as $index => $definition) {
             if (! is_array($definition)) {
                 throw InvalidSourceException::invalidDefinition($index, 'each source must be an array.');
             }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Erag\OrphanStorage\Contracts;
+namespace Erag\OrphanFiles\Contracts;
 
 interface PathNormalizer
 {

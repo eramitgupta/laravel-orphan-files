@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Contracts;
+namespace Erag\OrphanFiles\Contracts;
 
-use Erag\OrphanStorage\References\Reference;
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Reference;
+use Erag\OrphanFiles\References\Source;
 
 interface ReferenceExtractor
 {

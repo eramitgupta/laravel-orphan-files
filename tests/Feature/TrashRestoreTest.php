@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 it('restores a cleaned file to its original path', function () {
     $this->travelTo('2026-11-15 10:00:00');
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     DB::table('users')->insert(['avatar' => 'avatars/jane.jpg']);
     storeFile('public', 'avatars/jane.jpg');
     storeFile('public', 'avatars/orphan.jpg', 'orphan');
@@ -91,7 +91,7 @@ it('moves files through a dedicated trash disk', function () {
     $this->travelTo('2026-11-15 10:00:00');
     Storage::fake('public');
     Storage::fake('local');
-    config()->set('orphan-storage.trash.disk', 'local');
+    config()->set('orphan-files.trash.disk', 'local');
     storeFile('public', 'avatars/orphan.jpg', 'orphan');
 
     $this->artisan('orphan:clean', ['--force' => true, '--force-ratio' => true])->assertSuccessful();
@@ -108,7 +108,7 @@ it('moves files through a dedicated trash disk', function () {
 it('purges trash older than the retention period', function () {
     $this->travelTo('2026-11-15 10:00:00');
     Storage::fake('public');
-    config()->set('orphan-storage.trash.retention_days', 30);
+    config()->set('orphan-files.trash.retention_days', 30);
     storeTrashedFile('public', '2026-10-15', 'avatars/old.jpg');
     storeTrashedFile('public', '2026-10-16', 'avatars/recent.jpg');
 

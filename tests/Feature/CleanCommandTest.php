@@ -1,8 +1,8 @@
 <?php
 
-use Erag\OrphanStorage\Events\OrphanStorageDeleted;
-use Erag\OrphanStorage\Events\OrphanStorageTrashed;
-use Erag\OrphanStorage\Jobs\CleanOrphansJob;
+use Erag\OrphanFiles\Events\OrphanFilesDeleted;
+use Erag\OrphanFiles\Events\OrphanFilesTrashed;
+use Erag\OrphanFiles\Jobs\CleanOrphansJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
  */
 function seedAvatars(): void
 {
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     DB::table('users')->insert([['avatar' => 'avatars/jane.jpg'], ['avatar' => 'avatars/john.jpg']]);
 
     storeFile('public', 'avatars/jane.jpg');
@@ -63,7 +63,7 @@ it('rejects an unknown mode', function () {
 
 it('protects references from every column type', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [
+    config()->set('orphan-files.sources', [
         ['table' => 'users', 'column' => 'avatar', 'type' => 'path'],
         ['table' => 'comments', 'column' => 'images', 'type' => 'json', 'key' => '*.path'],
         ['table' => 'posts', 'column' => 'body', 'type' => 'html'],
@@ -110,8 +110,8 @@ it('cleans recent files when --older-than is shorter than the grace period', fun
 
 it('keeps excluded paths and patterns', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.exclude_paths', ['.gitignore']);
-    config()->set('orphan-storage.exclude_patterns', ['defaults/*']);
+    config()->set('orphan-files.exclude_paths', ['.gitignore']);
+    config()->set('orphan-files.exclude_patterns', ['defaults/*']);
     seedAvatars();
     storeFile('public', 'avatars/.gitignore');
     storeFile('public', 'defaults/placeholder.png');
@@ -124,8 +124,8 @@ it('keeps excluded paths and patterns', function () {
 
 it('keeps files that fail the size and extension rules', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.min_size', 5);
-    config()->set('orphan-storage.except_extensions', ['pdf']);
+    config()->set('orphan-files.min_size', 5);
+    config()->set('orphan-files.except_extensions', ['pdf']);
     seedAvatars();
     storeFile('public', 'docs/report.pdf', 'large enough');
     storeFile('public', 'avatars/tiny.jpg', 'x');
@@ -138,7 +138,7 @@ it('keeps files that fail the size and extension rules', function () {
 
 it('aborts when the orphan ratio exceeds the threshold', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.max_orphan_ratio', 50);
+    config()->set('orphan-files.max_orphan_ratio', 50);
     seedAvatars();
     storeFile('public', 'avatars/orphan-2.jpg');
     storeFile('public', 'avatars/orphan-3.jpg');
@@ -152,7 +152,7 @@ it('aborts when the orphan ratio exceeds the threshold', function () {
 
 it('cleans past the threshold with --force-ratio', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.max_orphan_ratio', 50);
+    config()->set('orphan-files.max_orphan_ratio', 50);
     seedAvatars();
     storeFile('public', 'avatars/orphan-2.jpg');
     storeFile('public', 'avatars/orphan-3.jpg');
@@ -164,7 +164,7 @@ it('cleans past the threshold with --force-ratio', function () {
 
 it('warns about the threshold during a dry run', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.max_orphan_ratio', 10);
+    config()->set('orphan-files.max_orphan_ratio', 10);
     seedAvatars();
 
     $this->artisan('orphan:clean')
@@ -186,7 +186,7 @@ it('stops after --limit files', function () {
 it('aborts before touching storage when a configured column does not exist', function () {
     Storage::fake('public');
     seedAvatars();
-    config()->push('orphan-storage.sources', ['table' => 'users', 'column' => 'photo', 'type' => 'path']);
+    config()->push('orphan-files.sources', ['table' => 'users', 'column' => 'photo', 'type' => 'path']);
 
     $this->artisan('orphan:clean', ['--force' => true])
         ->expectsOutputToContain("column [photo] doesn't exist on table [users]")
@@ -195,28 +195,28 @@ it('aborts before touching storage when a configured column does not exist', fun
     Storage::disk('public')->assertExists('avatars/orphan.jpg');
 });
 
-it('dispatches OrphanStorageTrashed with the trashed paths', function () {
+it('dispatches OrphanFilesTrashed with the trashed paths', function () {
     $this->travelTo('2026-11-15 10:00:00');
     Storage::fake('public');
     seedAvatars();
-    Event::fake([OrphanStorageTrashed::class]);
+    Event::fake([OrphanFilesTrashed::class]);
 
     $this->artisan('orphan:clean', ['--force' => true])->assertSuccessful();
 
-    Event::assertDispatched(OrphanStorageTrashed::class, fn (OrphanStorageTrashed $event): bool => $event->disk === 'public'
+    Event::assertDispatched(OrphanFilesTrashed::class, fn (OrphanFilesTrashed $event): bool => $event->disk === 'public'
         && $event->paths === ['avatars/orphan.jpg']
         && $event->bytes === 6
         && $event->trashDirectory === '.orphan-trash/public/2026-11-15');
 });
 
-it('dispatches OrphanStorageDeleted in delete mode', function () {
+it('dispatches OrphanFilesDeleted in delete mode', function () {
     Storage::fake('public');
     seedAvatars();
-    Event::fake([OrphanStorageDeleted::class]);
+    Event::fake([OrphanFilesDeleted::class]);
 
     $this->artisan('orphan:clean', ['--force' => true, '--mode' => 'delete'])->assertSuccessful();
 
-    Event::assertDispatched(OrphanStorageDeleted::class, fn (OrphanStorageDeleted $event): bool => $event->paths === ['avatars/orphan.jpg']);
+    Event::assertDispatched(OrphanFilesDeleted::class, fn (OrphanFilesDeleted $event): bool => $event->paths === ['avatars/orphan.jpg']);
 });
 
 it('requires --force to queue a clean', function () {
@@ -251,7 +251,7 @@ it('cleans orphans when the queued job runs', function () {
 it('never widens --dir beyond the configured directories', function () {
     Storage::fake('public');
     Storage::fake('local');
-    config()->set('orphan-storage.disks', ['public' => ['avatars/'], 'local' => ['products/']]);
+    config()->set('orphan-files.disks', ['public' => ['avatars/'], 'local' => ['products/']]);
     storeFile('public', 'avatars/orphan.jpg');
     storeFile('local', 'avatars/private.jpg');
 
@@ -263,7 +263,7 @@ it('never widens --dir beyond the configured directories', function () {
 
 it('rejects --dir outside the configured directories', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.disks', ['public' => ['avatars/']]);
+    config()->set('orphan-files.disks', ['public' => ['avatars/']]);
     storeFile('public', 'posts/orphan.jpg');
 
     $this->artisan('orphan:clean', ['--force' => true, '--dir' => ['posts']])

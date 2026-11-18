@@ -1,8 +1,8 @@
 <?php
 
-use Erag\OrphanStorage\OrphanStorageServiceProvider;
+use Erag\OrphanFiles\OrphanFilesServiceProvider;
 use Orchestra\Testbench\Foundation\Application;
-use OrphanStorageDemo\DemoServiceProvider;
+use OrphanFilesDemo\DemoServiceProvider;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +20,7 @@ require_once __DIR__.'/DemoServiceProvider.php';
 return Application::create(options: [
     'extra' => [
         'providers' => [
-            OrphanStorageServiceProvider::class,
+            OrphanFilesServiceProvider::class,
             DemoServiceProvider::class,
         ],
         'dont-discover' => ['*'],

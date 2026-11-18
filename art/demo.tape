@@ -1,4 +1,4 @@
-# README demo for erag/laravel-orphan-storage.
+# README demo for erag/laravel-orphan-files.
 #
 # Regenerate from the package root (needs vhs, ttyd and ffmpeg):
 #   vhs art/demo.tape      (or: composer demo)

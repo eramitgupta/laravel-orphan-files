@@ -1,39 +1,39 @@
 <?php
 
-namespace Erag\OrphanStorage;
+namespace Erag\OrphanFiles;
 
 use Closure;
-use Erag\OrphanStorage\Actions\DeleteFiles;
-use Erag\OrphanStorage\Actions\PurgeTrash;
-use Erag\OrphanStorage\Actions\RestoreFiles;
-use Erag\OrphanStorage\Actions\TrashFiles;
-use Erag\OrphanStorage\Contracts\FileFilter;
-use Erag\OrphanStorage\Contracts\PathNormalizer;
-use Erag\OrphanStorage\Contracts\ReferenceExtractor;
-use Erag\OrphanStorage\Diff\OrphanDetector;
-use Erag\OrphanStorage\Events\OrphanScanCompleted;
-use Erag\OrphanStorage\Exceptions\InvalidSourceException;
-use Erag\OrphanStorage\Exceptions\SafetyThresholdExceeded;
-use Erag\OrphanStorage\Jobs\CleanOrphansJob;
-use Erag\OrphanStorage\Jobs\RunScanJob;
-use Erag\OrphanStorage\References\ReferenceCollector;
-use Erag\OrphanStorage\References\Source;
-use Erag\OrphanStorage\References\SourceRegistry;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Scanner\StorageScanner;
-use Erag\OrphanStorage\Support\Data\ActionResult;
-use Erag\OrphanStorage\Support\Data\CleanOptions;
-use Erag\OrphanStorage\Support\Data\CleanResult;
-use Erag\OrphanStorage\Support\Data\Explanation;
-use Erag\OrphanStorage\Support\Data\ScanOptions;
-use Erag\OrphanStorage\Support\Data\ScanReport;
-use Erag\OrphanStorage\Support\Data\TrashedFile;
-use Erag\OrphanStorage\Support\Filters\ExcludePathFilter;
-use Erag\OrphanStorage\Support\Filters\FileRuleFilter;
-use Erag\OrphanStorage\Support\Filters\GracePeriodFilter;
-use Erag\OrphanStorage\Support\Filters\SafetyRatioGuard;
-use Erag\OrphanStorage\Support\Normalizers\NormalizerPipeline;
-use Erag\OrphanStorage\Support\Trash;
+use Erag\OrphanFiles\Actions\DeleteFiles;
+use Erag\OrphanFiles\Actions\PurgeTrash;
+use Erag\OrphanFiles\Actions\RestoreFiles;
+use Erag\OrphanFiles\Actions\TrashFiles;
+use Erag\OrphanFiles\Contracts\FileFilter;
+use Erag\OrphanFiles\Contracts\PathNormalizer;
+use Erag\OrphanFiles\Contracts\ReferenceExtractor;
+use Erag\OrphanFiles\Diff\OrphanDetector;
+use Erag\OrphanFiles\Events\OrphanScanCompleted;
+use Erag\OrphanFiles\Exceptions\InvalidSourceException;
+use Erag\OrphanFiles\Exceptions\SafetyThresholdExceeded;
+use Erag\OrphanFiles\Jobs\CleanOrphansJob;
+use Erag\OrphanFiles\Jobs\RunScanJob;
+use Erag\OrphanFiles\References\ReferenceCollector;
+use Erag\OrphanFiles\References\Source;
+use Erag\OrphanFiles\References\SourceRegistry;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Scanner\StorageScanner;
+use Erag\OrphanFiles\Support\Data\ActionResult;
+use Erag\OrphanFiles\Support\Data\CleanOptions;
+use Erag\OrphanFiles\Support\Data\CleanResult;
+use Erag\OrphanFiles\Support\Data\Explanation;
+use Erag\OrphanFiles\Support\Data\ScanOptions;
+use Erag\OrphanFiles\Support\Data\ScanReport;
+use Erag\OrphanFiles\Support\Data\TrashedFile;
+use Erag\OrphanFiles\Support\Filters\ExcludePathFilter;
+use Erag\OrphanFiles\Support\Filters\FileRuleFilter;
+use Erag\OrphanFiles\Support\Filters\GracePeriodFilter;
+use Erag\OrphanFiles\Support\Filters\SafetyRatioGuard;
+use Erag\OrphanFiles\Support\Normalizers\NormalizerPipeline;
+use Erag\OrphanFiles\Support\Trash;
 use Generator;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Config\Repository;
@@ -44,10 +44,10 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
- * The orphan storage pipeline: validate sources, index references, stream
+ * The orphan files pipeline: validate sources, index references, stream
  * storage, filter and act. Commands and jobs only call into this class.
  */
-class OrphanStorage
+class OrphanFiles
 {
     public const MODES = ['trash', 'delete'];
 
@@ -309,7 +309,7 @@ class OrphanStorage
         $disks = $options->disks !== null && $options->disks !== [] ? $options->disks : array_keys($configured);
 
         if ($disks === []) {
-            throw new InvalidArgumentException('No disks to scan. Add them under "disks" in config/orphan-storage.php.');
+            throw new InvalidArgumentException('No disks to scan. Add them under "disks" in config/orphan-files.php.');
         }
 
         $targets = [];
@@ -322,7 +322,7 @@ class OrphanStorage
             }
 
             if (! isset($configured[$disk])) {
-                throw new InvalidArgumentException("Disk [{$disk}] isn't listed under \"disks\" in config/orphan-storage.php. Add it there before scanning it.");
+                throw new InvalidArgumentException("Disk [{$disk}] isn't listed under \"disks\" in config/orphan-files.php. Add it there before scanning it.");
             }
 
             $directories = $options->directories !== null && $options->directories !== []
@@ -357,7 +357,7 @@ class OrphanStorage
      */
     public function mode(?string $mode): string
     {
-        $mode ??= (string) $this->config->get('orphan-storage.mode', 'trash');
+        $mode ??= (string) $this->config->get('orphan-files.mode', 'trash');
 
         if (! in_array($mode, self::MODES, true)) {
             throw new InvalidArgumentException("Invalid mode [{$mode}]. Use \"trash\" or \"delete\".");
@@ -368,7 +368,7 @@ class OrphanStorage
 
     public function guard(): SafetyRatioGuard
     {
-        $ratio = $this->config->get('orphan-storage.max_orphan_ratio', 90);
+        $ratio = $this->config->get('orphan-files.max_orphan_ratio', 90);
 
         return new SafetyRatioGuard(is_numeric($ratio) ? (float) $ratio : null);
     }
@@ -484,34 +484,34 @@ class OrphanStorage
      */
     protected function filters(?int $minimumAgeMinutes, ?int $referenceTime = null): array
     {
-        $graceMinutes = $minimumAgeMinutes ?? (int) round((float) $this->config->get('orphan-storage.grace_period_hours', 24) * 60);
+        $graceMinutes = $minimumAgeMinutes ?? (int) round((float) $this->config->get('orphan-files.grace_period_hours', 24) * 60);
         $custom = [];
 
-        foreach ((array) $this->config->get('orphan-storage.filters', []) as $filter) {
+        foreach ((array) $this->config->get('orphan-files.filters', []) as $filter) {
             $filter = is_string($filter) ? $this->container->make($filter) : $filter;
 
             if (! $filter instanceof FileFilter) {
-                throw new InvalidArgumentException('Every class in orphan-storage.filters has to implement FileFilter.');
+                throw new InvalidArgumentException('Every class in orphan-files.filters has to implement FileFilter.');
             }
 
             $custom[] = $filter;
         }
 
-        $minSize = $this->config->get('orphan-storage.min_size');
-        $maxSize = $this->config->get('orphan-storage.max_size');
+        $minSize = $this->config->get('orphan-files.min_size');
+        $maxSize = $this->config->get('orphan-files.max_size');
 
         return [
             new ExcludePathFilter(
-                array_values(array_filter((array) $this->config->get('orphan-storage.exclude_paths', []), 'is_string')),
-                array_values(array_filter((array) $this->config->get('orphan-storage.exclude_patterns', []), 'is_string')),
-                (bool) $this->config->get('orphan-storage.case_sensitive', true),
+                array_values(array_filter((array) $this->config->get('orphan-files.exclude_paths', []), 'is_string')),
+                array_values(array_filter((array) $this->config->get('orphan-files.exclude_patterns', []), 'is_string')),
+                (bool) $this->config->get('orphan-files.case_sensitive', true),
             ),
             new GracePeriodFilter($graceMinutes, $referenceTime),
             new FileRuleFilter(
                 is_numeric($minSize) ? (int) $minSize : null,
                 is_numeric($maxSize) ? (int) $maxSize : null,
-                array_values(array_filter((array) $this->config->get('orphan-storage.only_extensions', []), 'is_string')),
-                array_values(array_filter((array) $this->config->get('orphan-storage.except_extensions', []), 'is_string')),
+                array_values(array_filter((array) $this->config->get('orphan-files.only_extensions', []), 'is_string')),
+                array_values(array_filter((array) $this->config->get('orphan-files.except_extensions', []), 'is_string')),
             ),
             ...$custom,
             ...$this->filters,
@@ -527,7 +527,7 @@ class OrphanStorage
     {
         $disks = [];
 
-        foreach ((array) $this->config->get('orphan-storage.disks', []) as $disk => $directories) {
+        foreach ((array) $this->config->get('orphan-files.disks', []) as $disk => $directories) {
             if (is_int($disk) && is_string($directories)) {
                 $disks[$directories] = [''];
 
@@ -658,8 +658,8 @@ class OrphanStorage
      */
     protected function onQueue(RunScanJob|CleanOrphansJob $job): RunScanJob|CleanOrphansJob
     {
-        $connection = $this->config->get('orphan-storage.queue.connection');
-        $queue = $this->config->get('orphan-storage.queue.name');
+        $connection = $this->config->get('orphan-files.queue.connection');
+        $queue = $this->config->get('orphan-files.queue.name');
 
         if (is_string($connection) && $connection !== '') {
             $job->onConnection($connection);

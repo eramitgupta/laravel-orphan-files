@@ -1,6 +1,6 @@
 <?php
 
-use Erag\OrphanStorage\Support\Normalizers\NormalizerPipeline;
+use Erag\OrphanFiles\Support\Normalizers\NormalizerPipeline;
 use Illuminate\Support\Str;
 
 function interpretations(string $value, string $disk = 'public'): array
@@ -66,7 +66,7 @@ it('maps MinIO path-style endpoint URLs', function () {
 });
 
 it('maps configured CDN prefixes', function () {
-    config()->set('orphan-storage.url_prefixes.s3', ['https://cdn.example.com']);
+    config()->set('orphan-files.url_prefixes.s3', ['https://cdn.example.com']);
 
     expect(primaryPath('https://cdn.example.com/tenant-1/uploads/report.pdf', 's3'))->toBe('uploads/report.pdf')
         ->and(primaryPath('https://cdn.example.com/uploads/report.pdf', 's3'))->toBe('uploads/report.pdf');
@@ -79,7 +79,7 @@ it('protects every path suffix of a URL on an unknown host', function () {
 });
 
 it('ignores unknown hosts when match_unknown_hosts is disabled', function () {
-    config()->set('orphan-storage.match_unknown_hosts', false);
+    config()->set('orphan-files.match_unknown_hosts', false);
 
     expect(interpretations('https://elsewhere.example/uploads/report.pdf'))->toBe([]);
 });
@@ -97,7 +97,7 @@ it('ignores data, mailto and javascript values', function (string $value) {
 ]);
 
 it('builds case-insensitive keys when configured', function () {
-    config()->set('orphan-storage.case_sensitive', false);
+    config()->set('orphan-files.case_sensitive', false);
 
     expect(app(NormalizerPipeline::class)->key('Avatars/Jane.JPG'))->toBe('avatars/jane.jpg');
 });
@@ -107,7 +107,7 @@ it('keeps keys case-sensitive by default', function () {
 });
 
 it('lets custom normalizers add an interpretation without removing the original', function () {
-    config()->set('orphan-storage.normalizers', [
+    config()->set('orphan-files.normalizers', [
         fn (string $path, string $disk): ?string => str_starts_with($path, 'legacy/') ? Str::after($path, 'legacy/') : null,
     ]);
 

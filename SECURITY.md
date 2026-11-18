@@ -19,12 +19,12 @@ Classic vulnerabilities belong here too, of course.
 
 ## Reporting a vulnerability
 
-Don't open a public issue, discussion or pull request for a security problem. Use GitHub's [private vulnerability reporting](https://github.com/eramitgupta/laravel-orphan-storage/security/advisories/new), or email Er Amit Gupta at [info.eramitgupta@gmail.com](mailto:info.eramitgupta@gmail.com).
+Don't open a public issue, discussion or pull request for a security problem. Use GitHub's [private vulnerability reporting](https://github.com/eramitgupta/laravel-orphan-files/security/advisories/new), or email Er Amit Gupta at [info.eramitgupta@gmail.com](mailto:info.eramitgupta@gmail.com).
 
 It helps a lot if you include:
 
 - the package, Laravel and PHP versions
-- the disk driver (local, S3, MinIO, ...) and the `disks` and `sources` parts of `config/orphan-storage.php`
+- the disk driver (local, S3, MinIO, ...) and the `disks` and `sources` parts of `config/orphan-files.php`
 - the steps to reproduce, with the output of `php artisan orphan:clean` without `--force`
 - what was affected, and whether the files could be restored from the trash
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Events;
+namespace Erag\OrphanFiles\Events;
 
-use Erag\OrphanStorage\Support\Data\ScanReport;
+use Erag\OrphanFiles\Support\Data\ScanReport;
 
 class OrphanScanCompleted
 {

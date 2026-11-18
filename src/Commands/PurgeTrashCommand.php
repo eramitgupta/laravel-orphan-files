@@ -1,10 +1,10 @@
 <?php
 
-namespace Erag\OrphanStorage\Commands;
+namespace Erag\OrphanFiles\Commands;
 
-use Erag\OrphanStorage\Commands\Concerns\InteractsWithOrphanOptions;
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Support\Bytes;
+use Erag\OrphanFiles\Commands\Concerns\InteractsWithOrphanOptions;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Support\Bytes;
 use Illuminate\Console\Command;
 use InvalidArgumentException;
 
@@ -20,10 +20,10 @@ class PurgeTrashCommand extends Command
 
     protected $description = 'Permanently delete trashed orphan files older than the retention period.';
 
-    public function handle(OrphanStorage $orphanStorage): int
+    public function handle(OrphanFiles $orphanFiles): int
     {
         try {
-            $result = $orphanStorage->purgeTrash(
+            $result = $orphanFiles->purgeTrash(
                 $this->option('disk') ?: null,
                 $this->integerOption('days'),
                 (bool) $this->option('all'),

@@ -1,6 +1,6 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Data;
+namespace Erag\OrphanFiles\Support\Data;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;

@@ -1,12 +1,12 @@
 <?php
 
-namespace Erag\OrphanStorage\Commands;
+namespace Erag\OrphanFiles\Commands;
 
-use Erag\OrphanStorage\Commands\Concerns\InteractsWithOrphanOptions;
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Bytes;
-use Erag\OrphanStorage\Support\CsvWriter;
+use Erag\OrphanFiles\Commands\Concerns\InteractsWithOrphanOptions;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Bytes;
+use Erag\OrphanFiles\Support\CsvWriter;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 use InvalidArgumentException;
@@ -27,7 +27,7 @@ class ScanCommand extends Command
 
     protected $description = 'Find storage files that no database row references.';
 
-    public function handle(OrphanStorage $orphanStorage): int
+    public function handle(OrphanFiles $orphanFiles): int
     {
         $writer = null;
 
@@ -35,7 +35,7 @@ class ScanCommand extends Command
             $options = $this->scanOptions();
 
             if ($this->option('queue')) {
-                $orphanStorage->queueScan($options);
+                $orphanFiles->queueScan($options);
                 $this->components->info('The scan was queued. Listen for the OrphanScanCompleted event to read the report.');
 
                 return self::SUCCESS;
@@ -44,7 +44,7 @@ class ScanCommand extends Command
             $writer = $this->exportWriter();
             $verbose = $this->output->isVerbose() && ! $this->option('json');
 
-            $report = $orphanStorage->scan($options, function (FileInfo $file, ?string $reasonToKeep) use ($writer, $verbose): void {
+            $report = $orphanFiles->scan($options, function (FileInfo $file, ?string $reasonToKeep) use ($writer, $verbose): void {
                 $writer?->write($file, $reasonToKeep);
 
                 if ($verbose) {
@@ -101,7 +101,7 @@ class ScanCommand extends Command
         $output = $this->option('output');
         $path = is_string($output) && $output !== ''
             ? $output
-            : rtrim((string) config('orphan-storage.export_path', storage_path('orphan-storage')), '/').'/orphans-'.Date::now()->format('Y-m-d_His').'.csv';
+            : rtrim((string) config('orphan-files.export_path', storage_path('orphan-files')), '/').'/orphans-'.Date::now()->format('Y-m-d_His').'.csv';
 
         return new CsvWriter($path);
     }

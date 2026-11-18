@@ -1,10 +1,10 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "erag/laravel-orphan-storage",
+    "name": "erag/laravel-orphan-files",
     "description": "Find and clean up unused, orphaned files in Laravel storage (local, S3, MinIO) that no database row uses, with a dry run and a restorable trash.",
     "type": "library",
     "license": "MIT",
-    "homepage": "https://github.com/eramitgupta/laravel-orphan-storage",
+    "homepage": "https://github.com/eramitgupta/laravel-orphan-files",
     "keywords": [
         "laravel",
         "laravel 12",
@@ -30,10 +30,10 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/eramitgupta/laravel-orphan-storage/issues",
-        "source": "https://github.com/eramitgupta/laravel-orphan-storage",
-        "docs": "https://erag.in/laravel-orphan-storage/",
-        "security": "https://github.com/eramitgupta/laravel-orphan-storage/security/policy"
+        "issues": "https://github.com/eramitgupta/laravel-orphan-files/issues",
+        "source": "https://github.com/eramitgupta/laravel-orphan-files",
+        "docs": "https://erag.in/laravel-orphan-files/",
+        "security": "https://github.com/eramitgupta/laravel-orphan-files/security/policy"
     },
     "require": {
         "php": "^8.2",
@@ -54,7 +54,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Erag\\OrphanStorage\\": "src/"
+            "Erag\\OrphanFiles\\": "src/"
         }
     },
     "autoload-dev": {
@@ -78,10 +78,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Erag\\OrphanStorage\\OrphanStorageServiceProvider"
+                "Erag\\OrphanFiles\\OrphanFilesServiceProvider"
             ],
             "aliases": {
-                "OrphanStorage": "Erag\\OrphanStorage\\Facades\\OrphanStorage"
+                "OrphanFiles": "Erag\\OrphanFiles\\Facades\\OrphanFiles"
             }
         }
     },

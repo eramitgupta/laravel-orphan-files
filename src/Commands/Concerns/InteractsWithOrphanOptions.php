@@ -1,12 +1,12 @@
 <?php
 
-namespace Erag\OrphanStorage\Commands\Concerns;
+namespace Erag\OrphanFiles\Commands\Concerns;
 
-use Erag\OrphanStorage\Support\Bytes;
-use Erag\OrphanStorage\Support\Data\DiskReport;
-use Erag\OrphanStorage\Support\Data\ScanOptions;
-use Erag\OrphanStorage\Support\Data\ScanReport;
-use Erag\OrphanStorage\Support\Duration;
+use Erag\OrphanFiles\Support\Bytes;
+use Erag\OrphanFiles\Support\Data\DiskReport;
+use Erag\OrphanFiles\Support\Data\ScanOptions;
+use Erag\OrphanFiles\Support\Data\ScanReport;
+use Erag\OrphanFiles\Support\Duration;
 use InvalidArgumentException;
 
 /**

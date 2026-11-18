@@ -2,7 +2,7 @@
 
 namespace Tests\Fixtures\Models;
 
-use Erag\OrphanStorage\Concerns\HasStorageFiles;
+use Erag\OrphanFiles\Concerns\HasStorageFiles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Erag\OrphanStorage\Events;
+namespace Erag\OrphanFiles\Events;
 
 /**
  * Dispatched once per batch (`chunk_size` files) moved to the trash.
  */
-class OrphanStorageTrashed
+class OrphanFilesTrashed
 {
     /**
      * @param  list<string>  $paths  Original paths on the source disk.

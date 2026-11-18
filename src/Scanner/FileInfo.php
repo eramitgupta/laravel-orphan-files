@@ -1,6 +1,6 @@
 <?php
 
-namespace Erag\OrphanStorage\Scanner;
+namespace Erag\OrphanFiles\Scanner;
 
 final class FileInfo
 {

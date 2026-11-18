@@ -1,14 +1,14 @@
 <?php
 
-namespace Erag\OrphanStorage\Commands;
+namespace Erag\OrphanFiles\Commands;
 
-use Erag\OrphanStorage\Commands\Concerns\InteractsWithOrphanOptions;
-use Erag\OrphanStorage\Exceptions\SafetyThresholdExceeded;
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Bytes;
-use Erag\OrphanStorage\Support\Data\CleanOptions;
-use Erag\OrphanStorage\Support\Data\CleanResult;
+use Erag\OrphanFiles\Commands\Concerns\InteractsWithOrphanOptions;
+use Erag\OrphanFiles\Exceptions\SafetyThresholdExceeded;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Bytes;
+use Erag\OrphanFiles\Support\Data\CleanOptions;
+use Erag\OrphanFiles\Support\Data\CleanResult;
 use Illuminate\Console\Command;
 use InvalidArgumentException;
 use RuntimeException;
@@ -31,7 +31,7 @@ class CleanCommand extends Command
 
     protected $description = 'Trash or delete orphaned storage files (dry run unless --force).';
 
-    public function handle(OrphanStorage $orphanStorage): int
+    public function handle(OrphanFiles $orphanFiles): int
     {
         $samples = [];
         $verbose = $this->output->isVerbose();
@@ -39,7 +39,7 @@ class CleanCommand extends Command
         try {
             $options = new CleanOptions(
                 scan: $this->scanOptions(),
-                mode: $orphanStorage->mode($this->option('mode') ?: null),
+                mode: $orphanFiles->mode($this->option('mode') ?: null),
                 limit: $this->integerOption('limit'),
                 dryRun: ! $this->option('force'),
                 forceRatio: (bool) $this->option('force-ratio'),
@@ -50,13 +50,13 @@ class CleanCommand extends Command
                     throw new InvalidArgumentException('--queue needs --force. Preview the clean without --queue first.');
                 }
 
-                $orphanStorage->queueClean($options);
+                $orphanFiles->queueClean($options);
                 $this->components->info('The clean was queued.');
 
                 return self::SUCCESS;
             }
 
-            $result = $orphanStorage->clean($options, function (FileInfo $file, ?string $reasonToKeep) use (&$samples, $verbose, $options): void {
+            $result = $orphanFiles->clean($options, function (FileInfo $file, ?string $reasonToKeep) use (&$samples, $verbose, $options): void {
                 if ($reasonToKeep !== null || ! $options->dryRun) {
                     return;
                 }
@@ -103,7 +103,7 @@ class CleanCommand extends Command
         }
 
         if ($result->ratioViolations !== []) {
-            $this->components->warn((new SafetyThresholdExceeded($result->ratioViolations, (float) config('orphan-storage.max_orphan_ratio', 90)))->getMessage());
+            $this->components->warn((new SafetyThresholdExceeded($result->ratioViolations, (float) config('orphan-files.max_orphan_ratio', 90)))->getMessage());
         }
 
         $this->components->info(sprintf(

@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Data;
+namespace Erag\OrphanFiles\Support\Data;
 
-use Erag\OrphanStorage\Scanner\FileInfo;
+use Erag\OrphanFiles\Scanner\FileInfo;
 
 final class Explanation
 {

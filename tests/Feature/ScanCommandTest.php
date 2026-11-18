@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\Events\OrphanScanCompleted;
-use Erag\OrphanStorage\Jobs\RunScanJob;
+use Erag\OrphanFiles\Events\OrphanScanCompleted;
+use Erag\OrphanFiles\Jobs\RunScanJob;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -15,7 +15,7 @@ it('summarises files, referenced files, orphans and reclaimable size', function 
     storeFile('public', 'avatars/kept.jpg', 'kept');
     storeFile('public', 'avatars/orphan.jpg', 'orphan!');
     storeFile('public', 'avatars/new.jpg', 'new', hoursOld: 1);
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     DB::table('users')->insert(['avatar' => 'avatars/kept.jpg']);
 
     $report = scanReport();
@@ -45,7 +45,7 @@ it('renders a summary table with a hint to preview the clean', function () {
 it('exports orphans to a CSV file', function () {
     Storage::fake('public');
     storeFile('public', 'avatars/orphan.jpg', 'orphan!');
-    $path = sys_get_temp_dir().'/orphan-storage-'.uniqid().'.csv';
+    $path = sys_get_temp_dir().'/orphan-files-'.uniqid().'.csv';
 
     $this->artisan('orphan:scan', ['--export' => 'csv', '--output' => $path])->assertSuccessful();
 
@@ -66,7 +66,7 @@ it('rejects unsupported export formats', function () {
 it('limits the scan to the given disk and directories', function () {
     Storage::fake('public');
     Storage::fake('s3');
-    config()->set('orphan-storage.disks', ['public' => [''], 's3' => ['uploads/']]);
+    config()->set('orphan-files.disks', ['public' => [''], 's3' => ['uploads/']]);
     storeFile('public', 'avatars/a.jpg');
     storeFile('public', 'posts/b.jpg');
     storeFile('s3', 'uploads/c.jpg');
@@ -88,7 +88,7 @@ it('never counts files in the trash folder', function () {
 
 it('fails with a clear error when a source table is missing', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'missing_table', 'column' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'missing_table', 'column' => 'path']]);
 
     $this->artisan('orphan:scan')
         ->expectsOutputToContain("table [missing_table] doesn't exist")
@@ -120,7 +120,7 @@ it('dispatches OrphanScanCompleted with the report', function () {
 });
 
 it('discovers models that use HasStorageFiles', function () {
-    config()->set('orphan-storage.discovery.paths', [__DIR__.'/../Fixtures/Models']);
+    config()->set('orphan-files.discovery.paths', [__DIR__.'/../Fixtures/Models']);
     Storage::fake('public');
     storeFile('public', 'avatars/jane.jpg');
     storeFile('public', 'avatars/orphan.jpg');
@@ -132,7 +132,7 @@ it('discovers models that use HasStorageFiles', function () {
 });
 
 it('fails when a source has no primary key to read it in chunks', function () {
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'primary_key' => null]]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'primary_key' => null]]);
 
     $this->artisan('orphan:scan')
         ->expectsOutputToContain('a unique "primary_key" is required')
@@ -157,7 +157,7 @@ it('reads source tables from the primary even when a replica lags behind', funct
         });
     }
     DB::connection('split')->table('users')->insert(['avatar' => 'avatars/new-upload.jpg']);
-    config()->set('orphan-storage.sources', [['connection' => 'split', 'table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['connection' => 'split', 'table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     storeFile('public', 'avatars/new-upload.jpg');
 
     $totals = scanReport()['totals'];

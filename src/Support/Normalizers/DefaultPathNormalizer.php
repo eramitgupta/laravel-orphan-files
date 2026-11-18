@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Normalizers;
+namespace Erag\OrphanFiles\Support\Normalizers;
 
-use Erag\OrphanStorage\Contracts\PathNormalizer;
+use Erag\OrphanFiles\Contracts\PathNormalizer;
 
 class DefaultPathNormalizer implements PathNormalizer
 {

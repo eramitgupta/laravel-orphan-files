@@ -1,6 +1,6 @@
 <?php
 
-namespace Erag\OrphanStorage\Support;
+namespace Erag\OrphanFiles\Support;
 
 final class Bytes
 {

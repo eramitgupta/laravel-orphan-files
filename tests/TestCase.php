@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Erag\OrphanStorage\OrphanStorageServiceProvider;
+use Erag\OrphanFiles\OrphanFilesServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -10,7 +10,7 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            OrphanStorageServiceProvider::class,
+            OrphanFilesServiceProvider::class,
         ];
     }
 
@@ -29,8 +29,8 @@ abstract class TestCase extends Orchestra
             'region' => 'eu-west-1',
             'root' => 'tenant-1',
         ]);
-        $app['config']->set('orphan-storage.discovery.paths', []);
-        $app['config']->set('orphan-storage.disks', ['public' => ['']]);
+        $app['config']->set('orphan-files.discovery.paths', []);
+        $app['config']->set('orphan-files.disks', ['public' => ['']]);
     }
 
     /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Contracts;
+namespace Erag\OrphanFiles\Contracts;
 
-use Erag\OrphanStorage\Scanner\FileInfo;
+use Erag\OrphanFiles\Scanner\FileInfo;
 
 interface FileFilter
 {

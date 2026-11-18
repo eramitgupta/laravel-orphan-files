@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Normalizers;
+namespace Erag\OrphanFiles\Support\Normalizers;
 
 use Closure;
-use Erag\OrphanStorage\Contracts\PathNormalizer;
+use Erag\OrphanFiles\Contracts\PathNormalizer;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
@@ -122,7 +122,7 @@ class NormalizerPipeline
             $path = Normalizer::normalize($path, Normalizer::FORM_C) ?: $path;
         }
 
-        return $this->config->get('orphan-storage.case_sensitive', true) ? $path : Str::lower($path);
+        return $this->config->get('orphan-files.case_sensitive', true) ? $path : Str::lower($path);
     }
 
     /**
@@ -152,7 +152,7 @@ class NormalizerPipeline
         $matches = $this->urls->matches($value, $disk);
 
         if ($matches === []) {
-            if (! $this->config->get('orphan-storage.match_unknown_hosts', true)) {
+            if (! $this->config->get('orphan-files.match_unknown_hosts', true)) {
                 return [];
             }
 
@@ -244,13 +244,13 @@ class NormalizerPipeline
 
         $normalizers = [];
 
-        foreach ([...(array) $this->config->get('orphan-storage.normalizers', []), ...$this->extensions] as $normalizer) {
+        foreach ([...(array) $this->config->get('orphan-files.normalizers', []), ...$this->extensions] as $normalizer) {
             if (is_string($normalizer) && class_exists($normalizer)) {
                 $normalizer = $this->container->make($normalizer);
             }
 
             if (! $normalizer instanceof PathNormalizer && ! is_callable($normalizer)) {
-                throw new InvalidArgumentException('Every entry in orphan-storage.normalizers has to implement PathNormalizer or be callable.');
+                throw new InvalidArgumentException('Every entry in orphan-files.normalizers has to implement PathNormalizer or be callable.');
             }
 
             $normalizers[] = $normalizer instanceof Closure || $normalizer instanceof PathNormalizer

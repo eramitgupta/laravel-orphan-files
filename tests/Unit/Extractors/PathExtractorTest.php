@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\References\Extractors\PathExtractor;
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Extractors\PathExtractor;
+use Erag\OrphanFiles\References\Source;
 
 it('returns the trimmed path', function () {
     $paths = (new PathExtractor)->extract('  avatars/jane.jpg ', new Source('users', 'avatar'));

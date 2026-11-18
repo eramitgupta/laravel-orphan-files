@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Support;
+namespace Erag\OrphanFiles\Support;
 
-use Erag\OrphanStorage\Scanner\FileInfo;
+use Erag\OrphanFiles\Scanner\FileInfo;
 use RuntimeException;
 
 /**

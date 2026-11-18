@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\Diff\TempTableDiffer;
-use Erag\OrphanStorage\Exceptions\TemporaryTableUnavailable;
+use Erag\OrphanFiles\Diff\TempTableDiffer;
+use Erag\OrphanFiles\Exceptions\TemporaryTableUnavailable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Str;

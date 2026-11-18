@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\References\Extractors\UrlExtractor;
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Extractors\UrlExtractor;
+use Erag\OrphanFiles\References\Source;
 
 it('returns the trimmed URL for normalisation', function () {
     $urls = (new UrlExtractor)->extract(' https://cdn.example.com/a.jpg ', new Source('products', 'image_url', 'url'));

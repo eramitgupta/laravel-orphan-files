@@ -1,13 +1,13 @@
 <?php
 
-namespace Erag\OrphanStorage\Diff;
+namespace Erag\OrphanFiles\Diff;
 
-use Erag\OrphanStorage\Exceptions\TemporaryTableUnavailable;
-use Erag\OrphanStorage\References\ReferenceCollector;
-use Erag\OrphanStorage\References\Source;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Chunks;
-use Erag\OrphanStorage\Support\Normalizers\NormalizerPipeline;
+use Erag\OrphanFiles\Exceptions\TemporaryTableUnavailable;
+use Erag\OrphanFiles\References\ReferenceCollector;
+use Erag\OrphanFiles\References\Source;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Chunks;
+use Erag\OrphanFiles\Support\Normalizers\NormalizerPipeline;
 use Generator;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
@@ -174,7 +174,7 @@ class OrphanDetector
             $database->release();
             $this->databaseUnavailable = true;
 
-            $this->logger->warning('Orphan storage keeps references in memory: '.$exception->getMessage(), [
+            $this->logger->warning('Orphan files keeps references in memory: '.$exception->getMessage(), [
                 'references' => $memory->count(),
             ]);
 
@@ -193,7 +193,7 @@ class OrphanDetector
     protected function databaseIndex(): TempTableDiffer
     {
         /** @var Connection $connection */
-        $connection = $this->db->connection($this->config->get('orphan-storage.diff.connection'));
+        $connection = $this->db->connection($this->config->get('orphan-files.diff.connection'));
 
         return $this->container->make(TempTableDiffer::class, ['connection' => $connection]);
     }
@@ -203,11 +203,11 @@ class OrphanDetector
      */
     protected function driver(): string
     {
-        $driver = $this->config->get('orphan-storage.diff.driver', 'auto');
+        $driver = $this->config->get('orphan-files.diff.driver', 'auto');
 
         if (! is_string($driver) || ! in_array($driver, self::DRIVERS, true)) {
             throw new InvalidArgumentException(sprintf(
-                'Invalid "orphan-storage.diff.driver" [%s]. Use "auto" (memory, moving to a temporary table past diff.memory_limit), "memory" or "database".',
+                'Invalid "orphan-files.diff.driver" [%s]. Use "auto" (memory, moving to a temporary table past diff.memory_limit), "memory" or "database".',
                 is_scalar($driver) ? (string) $driver : get_debug_type($driver),
             ));
         }
@@ -217,11 +217,11 @@ class OrphanDetector
 
     protected function chunkSize(): int
     {
-        return max(1, (int) $this->config->get('orphan-storage.chunk_size', 1000));
+        return max(1, (int) $this->config->get('orphan-files.chunk_size', 1000));
     }
 
     protected function memoryLimit(): int
     {
-        return max(1, (int) $this->config->get('orphan-storage.diff.memory_limit', 250000));
+        return max(1, (int) $this->config->get('orphan-files.diff.memory_limit', 250000));
     }
 }

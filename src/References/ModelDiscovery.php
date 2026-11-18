@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\References;
+namespace Erag\OrphanFiles\References;
 
-use Erag\OrphanStorage\Concerns\HasStorageFiles;
+use Erag\OrphanFiles\Concerns\HasStorageFiles;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -31,7 +31,7 @@ class ModelDiscovery
      */
     public function models(): array
     {
-        $settings = (array) $this->config->get('orphan-storage.discovery', []);
+        $settings = (array) $this->config->get('orphan-files.discovery', []);
         $cacheKey = md5((string) json_encode($settings));
 
         return $this->discovered[$cacheKey] ??= $this->discover();
@@ -42,10 +42,10 @@ class ModelDiscovery
      */
     protected function discover(): array
     {
-        $candidates = (array) $this->config->get('orphan-storage.discovery.models', []);
+        $candidates = (array) $this->config->get('orphan-files.discovery.models', []);
 
-        if ($this->config->get('orphan-storage.discovery.enabled', true)) {
-            foreach ((array) $this->config->get('orphan-storage.discovery.paths', []) as $path) {
+        if ($this->config->get('orphan-files.discovery.enabled', true)) {
+            foreach ((array) $this->config->get('orphan-files.discovery.paths', []) as $path) {
                 if (! is_string($path) || ! $this->files->isDirectory($path)) {
                     continue;
                 }

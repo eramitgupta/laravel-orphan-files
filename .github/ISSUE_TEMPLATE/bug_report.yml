@@ -6,13 +6,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        If the bug could delete or trash a file that's still in use, please don't post it here. Report it privately as described in [SECURITY.md](https://github.com/eramitgupta/laravel-orphan-storage/blob/main/SECURITY.md).
+        If the bug could delete or trash a file that's still in use, please don't post it here. Report it privately as described in [SECURITY.md](https://github.com/eramitgupta/laravel-orphan-files/blob/main/SECURITY.md).
 
   - type: input
     id: package-version
     attributes:
       label: Package version
-      description: Run `composer show erag/laravel-orphan-storage`.
+      description: Run `composer show erag/laravel-orphan-files`.
       placeholder: "1.0.0"
     validations:
       required: true
@@ -51,7 +51,7 @@ body:
     id: config
     attributes:
       label: Relevant config
-      description: The `disks` and `sources` parts of `config/orphan-storage.php`, plus any options you changed. Remove secrets.
+      description: The `disks` and `sources` parts of `config/orphan-files.php`, plus any options you changed. Remove secrets.
       render: php
     validations:
       required: true

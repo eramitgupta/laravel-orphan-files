@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Diff;
+namespace Erag\OrphanFiles\Diff;
 
-use Erag\OrphanStorage\Exceptions\TemporaryTableUnavailable;
-use Erag\OrphanStorage\Support\Chunks;
+use Erag\OrphanFiles\Exceptions\TemporaryTableUnavailable;
+use Erag\OrphanFiles\Support\Chunks;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
@@ -35,7 +35,7 @@ class TempTableDiffer implements ReferenceIndex
 
     public function __construct(protected Connection $connection)
     {
-        $this->table = 'orphan_storage_refs_'.Str::lower(Str::random(16));
+        $this->table = 'orphan_files_refs_'.Str::lower(Str::random(16));
     }
 
     /**

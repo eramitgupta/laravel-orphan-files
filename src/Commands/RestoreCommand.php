@@ -1,10 +1,10 @@
 <?php
 
-namespace Erag\OrphanStorage\Commands;
+namespace Erag\OrphanFiles\Commands;
 
-use Erag\OrphanStorage\Commands\Concerns\InteractsWithOrphanOptions;
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Support\Bytes;
+use Erag\OrphanFiles\Commands\Concerns\InteractsWithOrphanOptions;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Support\Bytes;
 use Illuminate\Console\Command;
 use InvalidArgumentException;
 
@@ -24,9 +24,9 @@ class RestoreCommand extends Command
 
     protected $description = 'Restore trashed orphan files to their original paths.';
 
-    public function handle(OrphanStorage $orphanStorage): int
+    public function handle(OrphanFiles $orphanFiles): int
     {
-        $disk = (string) ($this->option('disk') ?: $orphanStorage->defaultDisk());
+        $disk = (string) ($this->option('disk') ?: $orphanFiles->defaultDisk());
         $date = $this->option('date') ?: null;
         $paths = array_values(array_filter((array) $this->argument('paths'), 'is_string'));
 
@@ -37,7 +37,7 @@ class RestoreCommand extends Command
         }
 
         if ($this->option('list')) {
-            return $this->listTrash($orphanStorage, $disk, $date, $paths[0] ?? '');
+            return $this->listTrash($orphanFiles, $disk, $date, $paths[0] ?? '');
         }
 
         if ($paths === [] && ! $this->option('all')) {
@@ -48,8 +48,8 @@ class RestoreCommand extends Command
 
         try {
             $result = $this->option('all')
-                ? $orphanStorage->restoreAll($disk, $date, (bool) $this->option('overwrite'))
-                : $orphanStorage->restore($disk, $paths, $date, (bool) $this->option('overwrite'));
+                ? $orphanFiles->restoreAll($disk, $date, (bool) $this->option('overwrite'))
+                : $orphanFiles->restore($disk, $paths, $date, (bool) $this->option('overwrite'));
         } catch (InvalidArgumentException $exception) {
             $this->components->error($exception->getMessage());
 
@@ -69,12 +69,12 @@ class RestoreCommand extends Command
         return $result->failed === 0 ? self::SUCCESS : self::FAILURE;
     }
 
-    protected function listTrash(OrphanStorage $orphanStorage, string $disk, ?string $date, string $prefix): int
+    protected function listTrash(OrphanFiles $orphanFiles, string $disk, ?string $date, string $prefix): int
     {
         $rows = [];
         $count = 0;
 
-        foreach ($orphanStorage->trashed($disk, $date, $prefix) as $file) {
+        foreach ($orphanFiles->trashed($disk, $date, $prefix) as $file) {
             $count++;
 
             if (count($rows) < self::LIST_LIMIT) {

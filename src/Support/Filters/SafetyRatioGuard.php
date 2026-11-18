@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Support\Filters;
+namespace Erag\OrphanFiles\Support\Filters;
 
-use Erag\OrphanStorage\Exceptions\SafetyThresholdExceeded;
-use Erag\OrphanStorage\Support\Data\ScanReport;
+use Erag\OrphanFiles\Exceptions\SafetyThresholdExceeded;
+use Erag\OrphanFiles\Support\Data\ScanReport;
 
 /**
  * Stops a clean when a disk would lose a suspicious share of its files,

@@ -1,6 +1,6 @@
 <?php
 
-namespace Erag\OrphanStorage\References;
+namespace Erag\OrphanFiles\References;
 
 final class Reference
 {

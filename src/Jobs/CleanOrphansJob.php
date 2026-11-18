@@ -1,16 +1,16 @@
 <?php
 
-namespace Erag\OrphanStorage\Jobs;
+namespace Erag\OrphanFiles\Jobs;
 
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Support\Data\CleanOptions;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Support\Data\CleanOptions;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
 /**
- * Runs a clean in the background. Listen for OrphanStorageTrashed or
- * OrphanStorageDeleted to follow progress.
+ * Runs a clean in the background. Listen for OrphanFilesTrashed or
+ * OrphanFilesDeleted to follow progress.
  */
 class CleanOrphansJob implements ShouldQueue
 {
@@ -20,8 +20,8 @@ class CleanOrphansJob implements ShouldQueue
 
     public function __construct(public CleanOptions $options = new CleanOptions) {}
 
-    public function handle(OrphanStorage $orphanStorage): void
+    public function handle(OrphanFiles $orphanFiles): void
     {
-        $orphanStorage->clean($this->options);
+        $orphanFiles->clean($this->options);
     }
 }

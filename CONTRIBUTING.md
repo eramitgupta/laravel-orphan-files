@@ -2,13 +2,13 @@
 
 Bug reports, doc fixes, tests and features are all welcome. Since this package deletes files, one rule beats everything else: a file that is still referenced must never be cleaned.
 
-The repository is [eramitgupta/laravel-orphan-storage](https://github.com/eramitgupta/laravel-orphan-storage).
+The repository is [eramitgupta/laravel-orphan-files](https://github.com/eramitgupta/laravel-orphan-files).
 
 ## Ways to help
 
-Found a bug? [Open an issue](https://github.com/eramitgupta/laravel-orphan-storage/issues/new/choose) with the bug report form, and include the output of the command run without `--force` first. You can see what's already reported on the [Issues](https://github.com/eramitgupta/laravel-orphan-storage/issues) page.
+Found a bug? [Open an issue](https://github.com/eramitgupta/laravel-orphan-files/issues/new/choose) with the bug report form, and include the output of the command run without `--force` first. You can see what's already reported on the [Issues](https://github.com/eramitgupta/laravel-orphan-files/issues) page.
 
-For a feature, use the feature request form and describe the problem before the solution you have in mind. Questions and ideas that aren't bugs go to [Discussions](https://github.com/eramitgupta/laravel-orphan-storage/discussions). Open and merged changes are on the [Pull requests](https://github.com/eramitgupta/laravel-orphan-storage/pulls) page.
+For a feature, use the feature request form and describe the problem before the solution you have in mind. Questions and ideas that aren't bugs go to [Discussions](https://github.com/eramitgupta/laravel-orphan-files/discussions). Open and merged changes are on the [Pull requests](https://github.com/eramitgupta/laravel-orphan-files/pulls) page.
 
 Please don't report security problems in a public issue. That includes any bug that could delete a file that's still in use. See [SECURITY.md](SECURITY.md).
 
@@ -21,14 +21,14 @@ Requirements: PHP 8.2+ (8.3+ for Laravel 13), Composer, and the SQLite PDO exten
 1. Fork and clone the repository. With the [GitHub CLI](https://cli.github.com/) this forks it to your account, clones your fork and adds this repository as the `upstream` remote:
 
    ```bash
-   gh repo fork eramitgupta/laravel-orphan-storage --clone
-   cd laravel-orphan-storage
+   gh repo fork eramitgupta/laravel-orphan-files --clone
+   cd laravel-orphan-files
    ```
 
-   Without the CLI, click "Fork" on [the repository page](https://github.com/eramitgupta/laravel-orphan-storage), clone your fork, and add the upstream remote yourself:
+   Without the CLI, click "Fork" on [the repository page](https://github.com/eramitgupta/laravel-orphan-files), clone your fork, and add the upstream remote yourself:
 
    ```bash
-   git remote add upstream https://github.com/eramitgupta/laravel-orphan-storage.git
+   git remote add upstream https://github.com/eramitgupta/laravel-orphan-files.git
    ```
 
 2. Install the dependencies:
@@ -57,10 +57,10 @@ Requirements: PHP 8.2+ (8.3+ for Laravel 13), Composer, and the SQLite PDO exten
 
    ```bash
    git push -u origin fix/trash-collision
-   gh pr create --repo eramitgupta/laravel-orphan-storage
+   gh pr create --repo eramitgupta/laravel-orphan-files
    ```
 
-   Or open it from the [Pull requests](https://github.com/eramitgupta/laravel-orphan-storage/pulls) page on GitHub. The pull request template asks for a summary and a short checklist.
+   Or open it from the [Pull requests](https://github.com/eramitgupta/laravel-orphan-files/pulls) page on GitHub. The pull request template asks for a summary and a short checklist.
 
 ## Running the Checks
 

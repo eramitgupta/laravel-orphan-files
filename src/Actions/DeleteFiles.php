@@ -1,11 +1,11 @@
 <?php
 
-namespace Erag\OrphanStorage\Actions;
+namespace Erag\OrphanFiles\Actions;
 
-use Erag\OrphanStorage\Events\OrphanStorageDeleted;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Chunks;
-use Erag\OrphanStorage\Support\Data\ActionResult;
+use Erag\OrphanFiles\Events\OrphanFilesDeleted;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Chunks;
+use Erag\OrphanFiles\Support\Data\ActionResult;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
@@ -35,7 +35,7 @@ class DeleteFiles
     {
         $result = new ActionResult('delete');
 
-        foreach (Chunks::of($files, (int) $this->config->get('orphan-storage.chunk_size', 1000)) as $chunk) {
+        foreach (Chunks::of($files, (int) $this->config->get('orphan-files.chunk_size', 1000)) as $chunk) {
             $byDisk = [];
 
             foreach ($chunk as $file) {
@@ -46,7 +46,7 @@ class DeleteFiles
                 $deleted = $this->deleteBatch((string) $disk, $batch, $result);
 
                 if ($deleted !== []) {
-                    $this->events->dispatch(new OrphanStorageDeleted(
+                    $this->events->dispatch(new OrphanFilesDeleted(
                         (string) $disk,
                         array_map(fn (FileInfo $file): string => $file->path, $deleted),
                         array_sum(array_map(fn (FileInfo $file): int => (int) $file->size, $deleted)),

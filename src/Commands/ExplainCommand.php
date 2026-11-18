@@ -1,10 +1,10 @@
 <?php
 
-namespace Erag\OrphanStorage\Commands;
+namespace Erag\OrphanFiles\Commands;
 
-use Erag\OrphanStorage\OrphanStorage;
-use Erag\OrphanStorage\Support\Bytes;
-use Erag\OrphanStorage\Support\Data\Explanation;
+use Erag\OrphanFiles\OrphanFiles;
+use Erag\OrphanFiles\Support\Bytes;
+use Erag\OrphanFiles\Support\Data\Explanation;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 use InvalidArgumentException;
@@ -17,10 +17,10 @@ class ExplainCommand extends Command
 
     protected $description = 'Show whether a file is referenced, and where, or why it counts as an orphan.';
 
-    public function handle(OrphanStorage $orphanStorage): int
+    public function handle(OrphanFiles $orphanFiles): int
     {
         try {
-            $explanation = $orphanStorage->explain((string) $this->argument('path'), $this->option('disk') ?: null);
+            $explanation = $orphanFiles->explain((string) $this->argument('path'), $this->option('disk') ?: null);
         } catch (InvalidArgumentException $exception) {
             $this->components->error($exception->getMessage());
 
@@ -67,7 +67,7 @@ class ExplainCommand extends Command
             default => $this->components->warn(sprintf(
                 'Orphan: none of the %d sources reference it. orphan:clean --force would %s it.',
                 $explanation->sourcesChecked,
-                config('orphan-storage.mode', 'trash'),
+                config('orphan-files.mode', 'trash'),
             )),
         };
     }

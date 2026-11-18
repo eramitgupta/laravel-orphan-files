@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\References\Extractors;
+namespace Erag\OrphanFiles\References\Extractors;
 
-use Erag\OrphanStorage\Contracts\ReferenceExtractor;
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\Contracts\ReferenceExtractor;
+use Erag\OrphanFiles\References\Source;
 
 /**
  * A column holding a full URL: Storage::url(), a CDN URL or a signed URL.

@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\References\Extractors\JsonExtractor;
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Extractors\JsonExtractor;
+use Erag\OrphanFiles\References\Source;
 
 function extractJson(mixed $value, string|array|null $key = null): array
 {

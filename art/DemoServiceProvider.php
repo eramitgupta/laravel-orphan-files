@@ -1,6 +1,6 @@
 <?php
 
-namespace OrphanStorageDemo;
+namespace OrphanFilesDemo;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -30,11 +30,11 @@ class DemoServiceProvider extends ServiceProvider
             'throw' => false,
         ]);
 
-        $config->set('orphan-storage.disks', ['public' => ['avatars/', 'comments/']]);
-        $config->set('orphan-storage.sources', [
+        $config->set('orphan-files.disks', ['public' => ['avatars/', 'comments/']]);
+        $config->set('orphan-files.sources', [
             ['table' => 'users', 'column' => 'avatar', 'type' => 'path', 'disk' => 'public'],
             ['table' => 'comments', 'column' => 'images', 'type' => 'json', 'key' => '*.path', 'disk' => 'public'],
         ]);
-        $config->set('orphan-storage.discovery.enabled', false);
+        $config->set('orphan-files.discovery.enabled', false);
     }
 }

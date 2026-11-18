@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\References\Extractors\HtmlExtractor;
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Extractors\HtmlExtractor;
+use Erag\OrphanFiles\References\Source;
 
 function extractHtml(string $html): array
 {

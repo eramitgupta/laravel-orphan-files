@@ -124,7 +124,7 @@ jobs:
         image: ${{ matrix.image }}
         env:
           MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: orphan_storage
+          MYSQL_DATABASE: orphan_files
         ports:
           - 3306:3306
         options: >-
@@ -137,7 +137,7 @@ jobs:
       DB_CONNECTION: ${{ matrix.connection }}
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
-      DB_DATABASE: orphan_storage
+      DB_DATABASE: orphan_files
       DB_USERNAME: root
       DB_PASSWORD: password
 
@@ -168,7 +168,7 @@ jobs:
         image: postgres:17
         env:
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: orphan_storage
+          POSTGRES_DB: orphan_files
         ports:
           - 5432:5432
         options: >-
@@ -181,7 +181,7 @@ jobs:
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
-      DB_DATABASE: orphan_storage
+      DB_DATABASE: orphan_files
       DB_USERNAME: postgres
       DB_PASSWORD: password
 

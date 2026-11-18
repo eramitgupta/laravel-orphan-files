@@ -1,11 +1,11 @@
 ---
-name: orphan-storage-setup
-description: "Set up erag/laravel-orphan-storage in a Laravel app. Use when installing the package, publishing config/orphan-storage.php, registering the disks to scan and every column that stores file references (path, json, html or url columns, or the HasStorageFiles trait), running the first orphan-storage scan, checking results with orphan:explain, or scheduling scans and cleanups safely."
+name: orphan-files-setup
+description: "Set up erag/laravel-orphan-files in a Laravel app. Use when installing the package, publishing config/orphan-files.php, registering the disks to scan and every column that stores file references (path, json, html or url columns, or the HasStorageFiles trait), running the first orphan-files scan, checking results with orphan:explain, or scheduling scans and cleanups safely."
 ---
 
-# Orphan Storage Setup
+# Orphan Files Setup
 
-Use this skill when a task involves adding `erag/laravel-orphan-storage` to a Laravel application, or fixing its configuration.
+Use this skill when a task involves adding `erag/laravel-orphan-files` to a Laravel application, or fixing its configuration.
 
 ## Safety rules
 
@@ -18,11 +18,11 @@ Use this skill when a task involves adding `erag/laravel-orphan-storage` to a La
 ### 1. Install the package
 
 ```bash
-composer require erag/laravel-orphan-storage
+composer require erag/laravel-orphan-files
 php artisan orphan:install
 ```
 
-`orphan:install` creates `config/orphan-storage.php` and asks before overwriting an existing one. Don't pass `--force` unless the user wants their config replaced with the package defaults.
+`orphan:install` creates `config/orphan-files.php` and asks before overwriting an existing one. Don't pass `--force` unless the user wants their config replaced with the package defaults.
 
 S3, MinIO, RustFS and other S3-compatible disks also need `league/flysystem-aws-s3-v3`.
 
@@ -60,7 +60,7 @@ Inspect the migrations, models and database schema. Find every column that store
 You can also declare the columns on the model instead. Models in `app/Models` are discovered automatically:
 
 ```php
-use Erag\OrphanStorage\Concerns\HasStorageFiles;
+use Erag\OrphanFiles\Concerns\HasStorageFiles;
 
 class User extends Authenticatable
 {

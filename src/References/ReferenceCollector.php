@@ -1,10 +1,10 @@
 <?php
 
-namespace Erag\OrphanStorage\References;
+namespace Erag\OrphanFiles\References;
 
-use Erag\OrphanStorage\Contracts\ReferenceExtractor;
-use Erag\OrphanStorage\Exceptions\InvalidSourceException;
-use Erag\OrphanStorage\Support\Normalizers\NormalizerPipeline;
+use Erag\OrphanFiles\Contracts\ReferenceExtractor;
+use Erag\OrphanFiles\Exceptions\InvalidSourceException;
+use Erag\OrphanFiles\Support\Normalizers\NormalizerPipeline;
 use Generator;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
@@ -61,7 +61,7 @@ class ReferenceCollector
             return $this->resolved[$source->type];
         }
 
-        $configured = (array) $this->config->get('orphan-storage.extractors', []);
+        $configured = (array) $this->config->get('orphan-files.extractors', []);
         $extractor = $this->extensions[$source->type] ?? $configured[$source->type] ?? $source->type;
 
         if (is_string($extractor) && class_exists($extractor)) {
@@ -173,7 +173,7 @@ class ReferenceCollector
         /** @var Builder $query */
         // Read from the primary: a lagging replica could miss a new reference and make a used file look orphaned.
         $query = $this->db->connection($source->connection)->table($source->table)->useWritePdo();
-        $chunkSize = max(1, (int) $this->config->get('orphan-storage.chunk_size', 1000));
+        $chunkSize = max(1, (int) $this->config->get('orphan-files.chunk_size', 1000));
 
         if ($source->column !== null) {
             $query->select(array_values(array_unique(array_filter([$source->primaryKey, $source->column]))))
@@ -234,7 +234,7 @@ class ReferenceCollector
         if ($source->column === null
             || ! in_array($source->type, self::SEARCHABLE_TYPES, true)
             || $this->paths->hasCustomNormalizers()
-            || ! $this->config->get('orphan-storage.case_sensitive', true)) {
+            || ! $this->config->get('orphan-files.case_sensitive', true)) {
             return [];
         }
 

@@ -1,9 +1,9 @@
 <?php
 
-use Erag\OrphanStorage\References\Extractors\HtmlExtractor;
-use Erag\OrphanStorage\References\Extractors\JsonExtractor;
-use Erag\OrphanStorage\References\Extractors\PathExtractor;
-use Erag\OrphanStorage\References\Extractors\UrlExtractor;
+use Erag\OrphanFiles\References\Extractors\HtmlExtractor;
+use Erag\OrphanFiles\References\Extractors\JsonExtractor;
+use Erag\OrphanFiles\References\Extractors\PathExtractor;
+use Erag\OrphanFiles\References\Extractors\UrlExtractor;
 
 return [
 
@@ -278,6 +278,6 @@ return [
     |
     */
 
-    'export_path' => storage_path('orphan-storage'),
+    'export_path' => storage_path('orphan-files'),
 
 ];

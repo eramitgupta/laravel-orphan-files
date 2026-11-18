@@ -59,7 +59,7 @@ function fixReferenceTableName(): string
 {
     Str::createRandomStringsUsing(fn (): string => 'fixedtablename16');
 
-    return 'orphan_storage_refs_fixedtablename16';
+    return 'orphan_files_refs_fixedtablename16';
 }
 
 /**
@@ -88,7 +88,7 @@ function useUnavailableConnection(): string
 {
     config()->set('database.connections.unavailable', [
         'driver' => 'sqlite',
-        'database' => '/nonexistent/orphan-storage/database.sqlite',
+        'database' => '/nonexistent/orphan-files/database.sqlite',
         'prefix' => '',
     ]);
 

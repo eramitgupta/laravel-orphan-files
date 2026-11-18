@@ -1,7 +1,7 @@
 <?php
 
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Filters\GracePeriodFilter;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Filters\GracePeriodFilter;
 use Illuminate\Support\Facades\Date;
 
 it('keeps files modified after the database was read', function () {

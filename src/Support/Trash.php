@@ -1,9 +1,9 @@
 <?php
 
-namespace Erag\OrphanStorage\Support;
+namespace Erag\OrphanFiles\Support;
 
-use Erag\OrphanStorage\Scanner\StorageScanner;
-use Erag\OrphanStorage\Support\Data\TrashedFile;
+use Erag\OrphanFiles\Scanner\StorageScanner;
+use Erag\OrphanFiles\Support\Data\TrashedFile;
 use Generator;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
@@ -33,14 +33,14 @@ class Trash
      */
     public function diskFor(string $sourceDisk): string
     {
-        $disk = $this->config->get('orphan-storage.trash.disk');
+        $disk = $this->config->get('orphan-files.trash.disk');
 
         return is_string($disk) && $disk !== '' ? $disk : $sourceDisk;
     }
 
     public function directory(): string
     {
-        $directory = trim((string) $this->config->get('orphan-storage.trash.directory', '.orphan-trash'), '/');
+        $directory = trim((string) $this->config->get('orphan-files.trash.directory', '.orphan-trash'), '/');
 
         return $directory === '' ? '.orphan-trash' : $directory;
     }
@@ -63,7 +63,7 @@ class Trash
      */
     public function excludedPrefixOn(string $disk): ?string
     {
-        $trashDisk = $this->config->get('orphan-storage.trash.disk');
+        $trashDisk = $this->config->get('orphan-files.trash.disk');
 
         if (is_string($trashDisk) && $trashDisk !== '' && $trashDisk !== $disk) {
             return null;
@@ -88,7 +88,7 @@ class Trash
 
     public function retentionDays(): int
     {
-        return max(0, (int) $this->config->get('orphan-storage.trash.retention_days', 30));
+        return max(0, (int) $this->config->get('orphan-files.trash.retention_days', 30));
     }
 
     /**
@@ -139,11 +139,11 @@ class Trash
     {
         $disks = [];
 
-        foreach ((array) $this->config->get('orphan-storage.disks', []) as $disk => $directories) {
+        foreach ((array) $this->config->get('orphan-files.disks', []) as $disk => $directories) {
             $disks[] = is_int($disk) && is_string($directories) ? $directories : (string) $disk;
         }
 
-        $trashDisk = $this->config->get('orphan-storage.trash.disk');
+        $trashDisk = $this->config->get('orphan-files.trash.disk');
 
         if (is_string($trashDisk) && $trashDisk !== '') {
             foreach ($this->filesystems->disk($trashDisk)->directories($this->directory()) as $directory) {

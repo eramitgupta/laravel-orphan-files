@@ -1,6 +1,6 @@
 <?php
 
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Source;
 use Illuminate\Support\Facades\Storage;
 use Tests\Fixtures\Models\Comment;
 use Tests\Fixtures\Models\Document;

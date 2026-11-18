@@ -1,12 +1,12 @@
 <?php
 
-namespace Erag\OrphanStorage\Actions;
+namespace Erag\OrphanFiles\Actions;
 
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Scanner\StorageScanner;
-use Erag\OrphanStorage\Support\Data\ActionResult;
-use Erag\OrphanStorage\Support\Data\TrashedFile;
-use Erag\OrphanStorage\Support\Trash;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Scanner\StorageScanner;
+use Erag\OrphanFiles\Support\Data\ActionResult;
+use Erag\OrphanFiles\Support\Data\TrashedFile;
+use Erag\OrphanFiles\Support\Trash;
 use Generator;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Support\Facades\Date;

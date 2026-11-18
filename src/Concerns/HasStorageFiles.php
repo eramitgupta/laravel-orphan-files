@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\Concerns;
+namespace Erag\OrphanFiles\Concerns;
 
-use Erag\OrphanStorage\References\Source;
+use Erag\OrphanFiles\References\Source;
 use Illuminate\Database\Eloquent\Model;
 
 /**

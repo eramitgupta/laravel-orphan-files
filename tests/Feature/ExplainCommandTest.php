@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Storage;
 
 it('lists the rows that reference a file', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     DB::table('users')->insert(['avatar' => '/avatars/jane.jpg']);
     storeFile('public', 'avatars/jane.jpg');
 
@@ -17,7 +17,7 @@ it('lists the rows that reference a file', function () {
 
 it('finds references in rich text and URLs', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'posts', 'column' => 'body', 'type' => 'html']]);
+    config()->set('orphan-files.sources', [['table' => 'posts', 'column' => 'body', 'type' => 'html']]);
     DB::table('posts')->insert(['body' => '<p>Intro</p><img src="https://app.test/storage/posts/my%20chart.png">']);
     storeFile('public', 'posts/my chart.png');
 
@@ -29,7 +29,7 @@ it('finds references in rich text and URLs', function () {
 
 it('explains why an unreferenced file is an orphan', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     storeFile('public', 'avatars/orphan.jpg');
 
     $this->artisan('orphan:explain', ['path' => 'avatars/orphan.jpg'])
@@ -48,7 +48,7 @@ it('explains why an unreferenced file is kept', function () {
 
 it('reports a reference to a missing file', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
     DB::table('users')->insert(['avatar' => 'avatars/gone.jpg']);
 
     $this->artisan('orphan:explain', ['path' => 'avatars/gone.jpg'])
@@ -58,7 +58,7 @@ it('reports a reference to a missing file', function () {
 
 it('finds references whose file name is partly URL-encoded', function () {
     Storage::fake('public');
-    config()->set('orphan-storage.sources', [['table' => 'posts', 'column' => 'body', 'type' => 'html']]);
+    config()->set('orphan-files.sources', [['table' => 'posts', 'column' => 'body', 'type' => 'html']]);
     DB::table('posts')->insert(['body' => '<img src="/storage/avatars/photo%20(1).jpg">']);
     storeFile('public', 'avatars/photo (1).jpg');
 

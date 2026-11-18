@@ -1,13 +1,13 @@
 <?php
 
-namespace Erag\OrphanStorage\Actions;
+namespace Erag\OrphanFiles\Actions;
 
-use Erag\OrphanStorage\Events\OrphanStorageTrashed;
-use Erag\OrphanStorage\Scanner\FileInfo;
-use Erag\OrphanStorage\Support\Chunks;
-use Erag\OrphanStorage\Support\Data\ActionResult;
-use Erag\OrphanStorage\Support\FileMover;
-use Erag\OrphanStorage\Support\Trash;
+use Erag\OrphanFiles\Events\OrphanFilesTrashed;
+use Erag\OrphanFiles\Scanner\FileInfo;
+use Erag\OrphanFiles\Support\Chunks;
+use Erag\OrphanFiles\Support\Data\ActionResult;
+use Erag\OrphanFiles\Support\FileMover;
+use Erag\OrphanFiles\Support\Trash;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Throwable;
@@ -34,7 +34,7 @@ class TrashFiles
         /** @var array<string, array{name: string, existed: bool, overflow?: string}> $buckets */
         $buckets = [];
 
-        foreach (Chunks::of($files, (int) $this->config->get('orphan-storage.chunk_size', 1000)) as $chunk) {
+        foreach (Chunks::of($files, (int) $this->config->get('orphan-files.chunk_size', 1000)) as $chunk) {
             /** @var array<string, array<string, array{paths: list<string>, bytes: int}>> $moved */
             $moved = [];
 
@@ -63,7 +63,7 @@ class TrashFiles
 
             foreach ($moved as $disk => $byBucket) {
                 foreach ($byBucket as $bucket => $batch) {
-                    $this->events->dispatch(new OrphanStorageTrashed(
+                    $this->events->dispatch(new OrphanFilesTrashed(
                         (string) $disk,
                         $batch['paths'],
                         $batch['bytes'],

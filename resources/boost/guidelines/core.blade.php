@@ -1,15 +1,15 @@
-## Orphan Storage (erag/laravel-orphan-storage)
+## Orphan Files (erag/laravel-orphan-files)
 
 This package finds files on Laravel disks (local, public, S3, and S3-compatible stores such as MinIO and RustFS) that no database row references. A clean moves them to a trash folder by default, where they can be restored. It only has Artisan commands, and no tables or migrations of its own.
 
 ### Installing
 
-- Install with `composer require erag/laravel-orphan-storage`, then run `php artisan orphan:install` to create `config/orphan-storage.php`.
+- Install with `composer require erag/laravel-orphan-files`, then run `php artisan orphan:install` to create `config/orphan-files.php`.
 - `orphan:install` asks before overwriting an existing config. Only pass `--force` when the user wants their config replaced.
 
 ### Registering sources
 
-- In `config/orphan-storage.php`, list the disks and directories to scan under `disks`. Only these locations are ever scanned or cleaned.
+- In `config/orphan-files.php`, list the disks and directories to scan under `disks`. Only these locations are ever scanned or cleaned.
 - List every column that stores a file reference under `sources`, with a `type`:
   - `path`: a disk path.
   - `json`: use `key` (e.g. `*.path`) to pick values.
@@ -19,7 +19,7 @@ This package finds files on Laravel disks (local, public, S3, and S3-compatible 
 - A missing source makes its files look orphaned. Check every column that stores uploads, including rich text and JSON.
 
 @verbatim
-<code-snippet name="Register disks and sources in config/orphan-storage.php" lang="php">
+<code-snippet name="Register disks and sources in config/orphan-files.php" lang="php">
 'disks' => [
     'public' => ['avatars/', 'posts/'],
 ],
@@ -33,7 +33,7 @@ This package finds files on Laravel disks (local, public, S3, and S3-compatible 
 </code-snippet>
 
 <code-snippet name="Declare storage columns on a model" lang="php">
-use Erag\OrphanStorage\Concerns\HasStorageFiles;
+use Erag\OrphanFiles\Concerns\HasStorageFiles;
 
 class Post extends Model
 {

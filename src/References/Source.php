@@ -1,8 +1,8 @@
 <?php
 
-namespace Erag\OrphanStorage\References;
+namespace Erag\OrphanFiles\References;
 
-use Erag\OrphanStorage\Exceptions\InvalidSourceException;
+use Erag\OrphanFiles\Exceptions\InvalidSourceException;
 use Illuminate\Database\Eloquent\Model;
 
 final class Source

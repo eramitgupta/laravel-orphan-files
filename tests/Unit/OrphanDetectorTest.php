@@ -1,11 +1,11 @@
 <?php
 
-use Erag\OrphanStorage\Contracts\ReferenceExtractor;
-use Erag\OrphanStorage\Diff\OrphanDetector;
-use Erag\OrphanStorage\References\Reference;
-use Erag\OrphanStorage\References\ReferenceCollector;
-use Erag\OrphanStorage\References\Source;
-use Erag\OrphanStorage\Scanner\StorageScanner;
+use Erag\OrphanFiles\Contracts\ReferenceExtractor;
+use Erag\OrphanFiles\Diff\OrphanDetector;
+use Erag\OrphanFiles\References\Reference;
+use Erag\OrphanFiles\References\ReferenceCollector;
+use Erag\OrphanFiles\References\Source;
+use Erag\OrphanFiles\Scanner\StorageScanner;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -82,7 +82,7 @@ it('treats files below a referenced directory as referenced', function () {
 });
 
 it('gives the same result with the temporary table driver', function () {
-    config()->set('orphan-storage.diff.driver', 'database');
+    config()->set('orphan-files.diff.driver', 'database');
     Storage::fake('public');
     storeFile('public', 'avatars/kept.jpg');
     storeFile('public', 'avatars/orphan.jpg');
@@ -99,8 +99,8 @@ it('gives the same result with the temporary table driver', function () {
 });
 
 it('moves references to a temporary table past the memory limit', function () {
-    config()->set('orphan-storage.diff.memory_limit', 2);
-    config()->set('orphan-storage.chunk_size', 1);
+    config()->set('orphan-files.diff.memory_limit', 2);
+    config()->set('orphan-files.chunk_size', 1);
     Storage::fake('public');
     storeFile('public', 'avatars/c.jpg');
     storeFile('public', 'avatars/orphan.jpg');
