@@ -169,7 +169,7 @@ class Trash
 
         rsort($buckets);
 
-        return array_values($buckets);
+        return $buckets;
     }
 
     /**
