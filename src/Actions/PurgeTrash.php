@@ -35,11 +35,13 @@ class PurgeTrash
     public function handle(?string $disk = null, ?int $retentionDays = null, bool $all = false, bool $dryRun = false): ActionResult
     {
         $result = new ActionResult('purge');
-        $cutoff = Date::today()->subDays($retentionDays ?? $this->trash->retentionDays())->format('Y-m-d');
+        $retention = max(0, $retentionDays ?? $this->trash->retentionDays());
+        $cutoff = Date::today()->subDays($retention)->format('Y-m-d');
 
         foreach ($disk !== null ? [$disk] : $this->trash->sourceDisks() as $sourceDisk) {
             foreach ($this->trash->buckets($sourceDisk) as $bucket) {
-                if (! $all && $this->trash->bucketDate($bucket) >= $cutoff) {
+                // A retention of 0 days keeps nothing, including today's trash.
+                if (! $all && $retention > 0 && $this->trash->bucketDate($bucket) >= $cutoff) {
                     continue;
                 }
 
