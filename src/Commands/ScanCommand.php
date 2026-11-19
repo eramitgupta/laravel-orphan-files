@@ -9,6 +9,7 @@ use Erag\OrphanFiles\Support\Bytes;
 use Erag\OrphanFiles\Support\CsvWriter;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -70,13 +71,14 @@ class ScanCommand extends Command
         $totals = $report->totals();
 
         if ($writer !== null) {
-            $this->components->info(sprintf('Exported %s orphans to %s', number_format($writer->rows), $writer->path));
+            $this->components->info(sprintf('Exported %s %s to %s', number_format($writer->rows), Str::plural('orphan', $writer->rows), $writer->path));
         }
 
         if ($totals['cleanable'] > 0) {
             $this->components->warn(sprintf(
-                '%s orphaned files (%s) can be cleaned. Preview with: php artisan orphan:clean',
+                '%s orphaned %s (%s) can be cleaned. Preview with: php artisan orphan:clean',
                 number_format($totals['cleanable']),
+                Str::plural('file', $totals['cleanable']),
                 Bytes::format($totals['reclaimable_bytes']),
             ));
         } else {
@@ -88,13 +90,13 @@ class ScanCommand extends Command
 
     protected function exportWriter(): ?CsvWriter
     {
-        $format = $this->option('export');
+        $format = $this->stringOption('export');
 
-        if ($format === null || $format === '') {
+        if ($format === null) {
             return null;
         }
 
-        if (strtolower((string) $format) !== 'csv') {
+        if (strtolower($format) !== 'csv') {
             throw new InvalidArgumentException("Unsupported export format [{$format}]. Use --export=csv.");
         }
 
