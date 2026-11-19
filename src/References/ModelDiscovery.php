@@ -61,7 +61,8 @@ class ModelDiscovery
         $models = [];
 
         foreach ($candidates as $candidate) {
-            if (is_string($candidate) && $this->usesTrait($candidate)) {
+            // usesTrait() also checks the Model parent; is_subclass_of() tells static analysis the class type.
+            if (is_string($candidate) && is_subclass_of($candidate, Model::class) && $this->usesTrait($candidate)) {
                 $models[$candidate] = $candidate;
             }
         }
@@ -79,7 +80,11 @@ class ModelDiscovery
         $sources = [];
 
         foreach ($this->models() as $model) {
-            array_push($sources, ...(new $model)->storageFileSources());
+            $instance = new $model;
+
+            if (method_exists($instance, 'storageFileSources')) {
+                array_push($sources, ...$instance->storageFileSources());
+            }
         }
 
         return $sources;
