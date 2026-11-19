@@ -13,7 +13,7 @@ it('restores a cleaned file to its original path', function () {
     $this->artisan('orphan:clean', ['--force' => true, '--force-ratio' => true])->assertSuccessful();
 
     $this->artisan('orphan:restore', ['paths' => ['avatars/orphan.jpg']])
-        ->expectsOutputToContain('Restored 1 files')
+        ->expectsOutputToContain('Restored 1 file (')
         ->assertSuccessful();
 
     expect(Storage::disk('public')->get('avatars/orphan.jpg'))->toBe('orphan');
@@ -113,7 +113,7 @@ it('purges trash older than the retention period', function () {
     storeTrashedFile('public', '2026-10-16', 'avatars/recent.jpg');
 
     $this->artisan('orphan:purge-trash')
-        ->expectsOutputToContain('Purged 1 trashed files')
+        ->expectsOutputToContain('Purged 1 trashed file (')
         ->assertSuccessful();
 
     Storage::disk('public')->assertMissing('.orphan-trash/public/2026-10-15');
@@ -136,7 +136,7 @@ it('only reports what would be purged with --dry-run', function () {
     storeTrashedFile('public', '2026-01-01', 'avatars/old.jpg');
 
     $this->artisan('orphan:purge-trash', ['--dry-run' => true])
-        ->expectsOutputToContain('Dry run: 1 trashed files')
+        ->expectsOutputToContain('Dry run: 1 trashed file (')
         ->assertSuccessful();
 
     Storage::disk('public')->assertExists('.orphan-trash/public/2026-01-01/avatars/old.jpg');
@@ -173,4 +173,77 @@ it('restores the newest copy when a path was trashed twice on the same day', fun
     $this->artisan('orphan:restore', ['paths' => ['avatars/jane.jpg'], '--date' => '2026-11-15'])->assertSuccessful();
 
     expect(Storage::disk('public')->get('avatars/jane.jpg'))->toBe('afternoon');
+});
+
+it('purges today\'s trash with --days=0', function () {
+    $this->travelTo('2026-11-15 10:00:00');
+    Storage::fake('public');
+    storeTrashedFile('public', '2026-11-15', 'avatars/today.jpg');
+
+    $this->artisan('orphan:purge-trash', ['--days' => 0])
+        ->expectsOutputToContain('Purged 1 trashed file (')
+        ->assertSuccessful();
+
+    Storage::disk('public')->assertMissing('.orphan-trash/public/2026-11-15/avatars/today.jpg');
+});
+
+it('lists and restores the trash of every configured disk when --disk is not given', function () {
+    Storage::fake('public');
+    Storage::fake('s3');
+    config()->set('orphan-files.disks', ['public' => ['avatars/'], 's3' => ['uploads/']]);
+    storeTrashedFile('public', '2026-11-15', 'avatars/a.jpg', 'a');
+    storeTrashedFile('s3', '2026-11-15', 'uploads/b.jpg', 'b');
+
+    $this->artisan('orphan:restore', ['--list' => true])
+        ->expectsOutputToContain('avatars/a.jpg')
+        ->expectsOutputToContain('uploads/b.jpg')
+        ->assertSuccessful();
+
+    $this->artisan('orphan:restore', ['--all' => true])
+        ->expectsOutputToContain('Restored 2 files')
+        ->assertSuccessful();
+
+    Storage::disk('public')->assertExists('avatars/a.jpg');
+    Storage::disk('s3')->assertExists('uploads/b.jpg');
+
+    $this->artisan('orphan:restore', ['--list' => true])
+        ->expectsOutputToContain('The trash is empty on public and s3.')
+        ->assertSuccessful();
+});
+
+it('finds a path in the trash of any configured disk when --disk is not given', function () {
+    Storage::fake('public');
+    Storage::fake('s3');
+    config()->set('orphan-files.disks', ['public' => ['avatars/'], 's3' => ['uploads/']]);
+    storeTrashedFile('s3', '2026-11-15', 'uploads/b.jpg', 'b');
+
+    $this->artisan('orphan:restore', ['paths' => ['uploads/b.jpg']])
+        ->expectsOutputToContain('Restored 1 file (')
+        ->assertSuccessful();
+
+    Storage::disk('s3')->assertExists('uploads/b.jpg');
+});
+
+it('reports a path that is in no trash once, naming the disks it checked', function () {
+    Storage::fake('public');
+    Storage::fake('s3');
+    config()->set('orphan-files.disks', ['public' => ['avatars/'], 's3' => ['uploads/']]);
+
+    $this->artisan('orphan:restore', ['paths' => ['uploads/missing.jpg']])
+        ->expectsOutputToContain('Not found in the trash of public or s3.')
+        ->assertFailed();
+});
+
+it('warns instead of reporting success when a restore is refused', function () {
+    Storage::fake('public');
+    storeTrashedFile('public', '2026-11-15', 'avatars/a.jpg', 'old');
+    Storage::disk('public')->put('avatars/a.jpg', 'new');
+
+    $this->artisan('orphan:restore', ['paths' => ['avatars/a.jpg'], '--disk' => 'public'])
+        ->expectsOutputToContain('A file already exists at the original path. Use --overwrite to replace it.')
+        ->expectsOutputToContain('1 file could not be restored, see above.')
+        ->doesntExpectOutputToContain('Restored 0 files')
+        ->assertFailed();
+
+    expect(Storage::disk('public')->get('avatars/a.jpg'))->toBe('new');
 });
