@@ -12,6 +12,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\LazyCollection;
+use stdClass;
 
 /**
  * Streams sources row by row and turns their values into disk references.
@@ -141,15 +142,7 @@ class ReferenceCollector
         }
 
         foreach ($extractor->extract($value, $source) as $item) {
-            $reference = match (true) {
-                $item instanceof Reference => $item,
-                is_string($item) => Reference::file($item),
-                default => null,
-            };
-
-            if ($reference === null) {
-                continue;
-            }
+            $reference = $item instanceof Reference ? $item : Reference::file($item);
 
             $disk = $reference->disk ?? $source->disk;
             $targets = $disk === null ? $disks : (in_array($disk, $disks, true) ? [$disk] : []);
@@ -166,7 +159,7 @@ class ReferenceCollector
      * Read a source in chunks, never loading the whole table.
      *
      * @param  list<string>  $needles  Only rows containing one of these strings.
-     * @return LazyCollection<int, object>
+     * @return LazyCollection<int, stdClass>
      */
     public function rows(Source $source, array $needles = []): LazyCollection
     {
@@ -185,7 +178,9 @@ class ReferenceCollector
 
             $query->where(function (Builder $query) use ($needles, $column): void {
                 foreach ($needles as $needle) {
-                    $query->orWhereRaw("{$column} like ? escape '!'", ['%'.$this->escapeLike($needle).'%']);
+                    // The column is wrapped by the grammar and the needle is a bound value. The raw
+                    // ESCAPE clause keeps LIKE exact on MySQL, Postgres, SQLite and SQL Server alike.
+                    $query->orWhereRaw("{$column} like ? escape '!'", ['%'.$this->escapeLike($needle).'%']); // @phpstan-ignore argument.type
                 }
             });
         }
