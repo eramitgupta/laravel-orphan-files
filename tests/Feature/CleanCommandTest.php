@@ -27,7 +27,7 @@ it('changes nothing without --force', function () {
 
     $this->artisan('orphan:clean')
         ->expectsOutputToContain('public:avatars/orphan.jpg')
-        ->expectsOutputToContain('Dry run: nothing was changed. Re-run with --force to trash 1 files.')
+        ->expectsOutputToContain('Dry run: nothing was changed. Re-run with --force to trash 1 file.')
         ->assertSuccessful();
 
     Storage::disk('public')->assertExists('avatars/orphan.jpg');
@@ -144,7 +144,7 @@ it('aborts when the orphan ratio exceeds the threshold', function () {
     storeFile('public', 'avatars/orphan-3.jpg');
 
     $this->artisan('orphan:clean', ['--force' => true])
-        ->expectsOutputToContain('Too many files would be cleaned (public: 60.0%, limit 50%)')
+        ->expectsOutputToContain('Too many files would be cleaned (public: 60%, limit 50%)')
         ->assertFailed();
 
     Storage::disk('public')->assertExists(['avatars/orphan.jpg', 'avatars/orphan-2.jpg', 'avatars/orphan-3.jpg']);
