@@ -13,6 +13,7 @@ class User extends Model
 
     protected $guarded = [];
 
+    /** @var array<string, string|array<string, mixed>> */
     protected array $storageFiles = ['avatar' => 'path'];
 
     protected ?string $storageDisk = 'public';
