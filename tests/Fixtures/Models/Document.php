@@ -14,6 +14,7 @@ class Document extends Model
 
     protected $guarded = [];
 
+    /** @var array<string, string|array<string, mixed>> */
     protected array $storageFiles = ['file' => 'path'];
 
     protected ?string $storageDisk = 'public';
