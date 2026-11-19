@@ -11,7 +11,19 @@ it('lists the rows that reference a file', function () {
 
     $this->artisan('orphan:explain', ['path' => 'avatars/jane.jpg'])
         ->expectsOutputToContain('users.avatar')
-        ->expectsOutputToContain('Kept: referenced by 1 row(s).')
+        ->expectsOutputToContain('Kept: referenced by 1 row.')
+        ->assertSuccessful();
+});
+
+it('asks for the path when it is missing', function () {
+    Storage::fake('public');
+    config()->set('orphan-files.sources', [['table' => 'users', 'column' => 'avatar', 'type' => 'path']]);
+    DB::table('users')->insert(['avatar' => 'avatars/jane.jpg']);
+    storeFile('public', 'avatars/jane.jpg');
+
+    $this->artisan('orphan:explain')
+        ->expectsQuestion('Which file do you want explained?', 'avatars/jane.jpg')
+        ->expectsOutputToContain('Kept: referenced by 1 row.')
         ->assertSuccessful();
 });
 
@@ -23,7 +35,7 @@ it('finds references in rich text and URLs', function () {
 
     $this->artisan('orphan:explain', ['path' => 'https://app.test/storage/posts/my%20chart.png'])
         ->expectsOutputToContain('posts.body')
-        ->expectsOutputToContain('Kept: referenced by 1 row(s).')
+        ->expectsOutputToContain('Kept: referenced by 1 row.')
         ->assertSuccessful();
 });
 
@@ -33,7 +45,7 @@ it('explains why an unreferenced file is an orphan', function () {
     storeFile('public', 'avatars/orphan.jpg');
 
     $this->artisan('orphan:explain', ['path' => 'avatars/orphan.jpg'])
-        ->expectsOutputToContain('Orphan: none of the 1 sources reference it. orphan:clean --force would trash it.')
+        ->expectsOutputToContain('Orphan: the only source does not reference it. orphan:clean --force would trash it.')
         ->assertSuccessful();
 });
 
@@ -63,6 +75,16 @@ it('finds references whose file name is partly URL-encoded', function () {
     storeFile('public', 'avatars/photo (1).jpg');
 
     $this->artisan('orphan:explain', ['path' => 'avatars/photo (1).jpg'])
-        ->expectsOutputToContain('Kept: referenced by 1 row(s).')
+        ->expectsOutputToContain('Kept: referenced by 1 row.')
+        ->assertSuccessful();
+});
+
+it('says an excluded file is skipped by scans and never cleaned', function () {
+    Storage::fake('public');
+    config()->set('orphan-files.exclude_paths', ['avatars/defaults/']);
+    storeFile('public', 'avatars/defaults/placeholder.png');
+
+    $this->artisan('orphan:explain', ['path' => 'avatars/defaults/placeholder.png', '--disk' => 'public'])
+        ->expectsOutputToContain('Excluded: it is excluded by path [avatars/defaults/]. Scans skip it and orphan:clean never touches it.')
         ->assertSuccessful();
 });
