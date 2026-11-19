@@ -78,6 +78,25 @@ it('limits the scan to the given disk and directories', function () {
         ->and($report['totals']['files'])->toBe(1);
 });
 
+it('does not count excluded paths and patterns at all', function () {
+    Storage::fake('public');
+    config()->set('orphan-files.exclude_paths', ['.gitignore', 'avatars/legacy/']);
+    config()->set('orphan-files.exclude_patterns', ['*.pdf']);
+    storeFile('public', 'avatars/orphan.jpg', 'orphan!');
+    storeFile('public', 'avatars/.gitignore');
+    storeFile('public', 'avatars/legacy/old.jpg');
+    storeFile('public', 'avatars/legacy/nested/older.jpg');
+    storeFile('public', 'docs/report.pdf');
+
+    $report = scanReport();
+
+    expect($report['totals']['files'])->toBe(1)
+        ->and($report['totals']['orphans'])->toBe(1)
+        ->and($report['totals']['protected'])->toBe(0)
+        ->and($report['totals']['cleanable'])->toBe(1)
+        ->and($report['disks']['public']['protected_by'])->toBe([]);
+});
+
 it('never counts files in the trash folder', function () {
     Storage::fake('public');
     storeFile('public', 'avatars/orphan.jpg');
