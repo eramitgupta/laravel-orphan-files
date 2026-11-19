@@ -39,7 +39,8 @@ class FileMover
                 throw new RuntimeException("Unable to write [{$to}] on disk [{$toDisk}].");
             }
         } finally {
-            if (is_resource($stream)) {
+            // Some adapters close the stream inside writeStream(); fclose() on a closed stream would throw.
+            if (is_resource($stream)) { // @phpstan-ignore function.alreadyNarrowedType
                 fclose($stream);
             }
         }
