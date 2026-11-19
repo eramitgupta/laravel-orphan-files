@@ -12,7 +12,7 @@ class SafetyThresholdExceeded extends RuntimeException
     public function __construct(public readonly array $ratios, public readonly float $threshold)
     {
         $details = collect($ratios)
-            ->map(fn (float $ratio, string $disk): string => sprintf('%s: %.1f%%', $disk, $ratio))
+            ->map(fn (float $ratio, string $disk): string => sprintf('%s: %s%%', $disk, rtrim(rtrim(number_format($ratio, 2, '.', ''), '0'), '.')))
             ->implode(', ');
 
         parent::__construct(sprintf(
