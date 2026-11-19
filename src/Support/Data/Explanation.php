@@ -27,6 +27,7 @@ final class Explanation
         public readonly bool $inScope,
         public readonly array $directories,
         public readonly int $sourcesChecked,
+        public readonly bool $excluded = false,
     ) {}
 
     public function verdict(): string
