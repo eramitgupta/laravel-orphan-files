@@ -46,6 +46,16 @@ trait InteractsWithOrphanOptions
     }
 
     /**
+     * A text option, or null when it is missing or empty.
+     */
+    protected function stringOption(string $name): ?string
+    {
+        $value = $this->option($name);
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    /**
      * @throws InvalidArgumentException
      */
     protected function integerOption(string $name): ?int
