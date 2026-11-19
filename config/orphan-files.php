@@ -146,7 +146,8 @@ return [
     | Exclusions
     |--------------------------------------------------------------------------
     |
-    | Files matching these paths or glob patterns are never cleaned. An entry
+    | Files matching these paths or glob patterns are skipped entirely: the
+    | scan doesn't count them and a clean never touches them. An entry
     | without a slash matches that file name in any directory.
     |
     */
