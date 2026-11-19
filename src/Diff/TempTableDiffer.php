@@ -146,7 +146,8 @@ class TempTableDiffer implements ReferenceIndex
         if ($this->isSqlServer()) {
             $grammar = $this->connection->getQueryGrammar();
 
-            $this->connection->unprepared(sprintf(
+            // Both names go through the grammar's wrap(), and the statement takes no user input.
+            $this->connection->unprepared(sprintf( // @phpstan-ignore argument.type
                 'create table %s (%s char(32) not null primary key)',
                 $grammar->wrap($this->sqlServerName()),
                 $grammar->wrap('hash'),
@@ -178,7 +179,7 @@ class TempTableDiffer implements ReferenceIndex
     protected function query(): Builder
     {
         $table = $this->isSqlServer()
-            ? new Expression($this->connection->getQueryGrammar()->wrap($this->sqlServerName()))
+            ? new Expression($this->connection->getQueryGrammar()->wrap($this->sqlServerName())) // @phpstan-ignore argument.type (the name is wrapped by the grammar)
             : $this->table;
 
         return $this->connection->table($table)->useWritePdo();
