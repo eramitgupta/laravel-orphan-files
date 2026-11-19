@@ -1,0 +1,16 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - src
+        - config
+        # The fixture models use the HasStorageFiles trait, so PHPStan analyses it through them.
+        - tests/Fixtures
+    ignoreErrors:
+        # The fixture models all declare $storageFiles, so these checks look always true here.
+        # Real models may leave the property out or type it loosely, so the trait keeps the checks.
+        -
+            identifier: function.alreadyNarrowedType
+            path: src/Concerns/HasStorageFiles.php
