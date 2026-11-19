@@ -15,6 +15,7 @@ class Comment extends Model
 
     protected $casts = ['images' => 'array'];
 
+    /** @var array<string, string|array<string, mixed>> */
     protected array $storageFiles = [
         'images' => ['type' => 'json', 'key' => '*.path'],
     ];
