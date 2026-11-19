@@ -153,7 +153,7 @@ List your upload folders and the columns that store paths in `config/orphan-file
 Not unless a column that references them is missing from your config. Run a scan first and check a few files with `orphan:explain`. Cleaned files go to a restorable trash by default.
 
 **Can I undo a clean?**
-Yes. `php artisan orphan:restore path/to/file` moves a trashed file back, and `--all` restores everything from a disk.
+Yes. `php artisan orphan:restore path/to/file` moves a trashed file back, and `--all` restores everything in the trash of every configured disk. Add `--disk=s3` to limit either one to a single disk.
 
 **Does it work with Livewire or Inertia file uploads?**
 Yes. It doesn't care how a file was uploaded. It only compares what's on the disk with the paths your database stores, and if you store them in an unusual format you can add a [custom extractor](https://erag.in/laravel-orphan-files/extending/extractors.html).
