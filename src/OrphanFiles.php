@@ -179,11 +179,11 @@ class OrphanFiles
         $inScope = ($trashPrefix === null || ! str_starts_with($clean, $trashPrefix))
             && $this->withinDirectories($clean, $directories);
 
-        $reasonToKeep = $file !== null && $references === []
-            ? $this->reasonToKeep($file, $this->filters(null))[1]
-            : null;
+        [$keptBy, $reasonToKeep] = $file !== null && $references === []
+            ? $this->reasonToKeep($file, $this->filters(null))
+            : [null, null];
 
-        return new Explanation($disk, $clean, $file, $references, $reasonToKeep, $inScope, $directories, count($sources));
+        return new Explanation($disk, $clean, $file, $references, $reasonToKeep, $inScope, $directories, count($sources), $keptBy === 'exclude_path');
     }
 
     /**
@@ -222,6 +222,39 @@ class OrphanFiles
     public function trashed(string $disk, ?string $date = null, string $prefix = ''): Generator
     {
         return $this->trash->entries($disk, $date, $prefix);
+    }
+
+    /**
+     * The disks that can have trashed files: every configured disk, plus the
+     * source disks found on a separate trash disk.
+     *
+     * @return list<string>
+     */
+    public function trashDisks(): array
+    {
+        return $this->trash->sourceDisks();
+    }
+
+    /**
+     * Whether the trash of a disk holds this file, or files below this directory.
+     */
+    public function inTrash(string $disk, string $path, ?string $date = null): bool
+    {
+        $path = trim(str_replace('\\', '/', $path), '/');
+
+        if ($path === '') {
+            return false;
+        }
+
+        if ($this->trash->find($disk, $path, $date) !== null) {
+            return true;
+        }
+
+        foreach ($this->trash->entries($disk, $date, $path) as $entry) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -450,12 +483,34 @@ class OrphanFiles
     }
 
     /**
+     * Stream the files in scope. Files matching `exclude_paths` or
+     * `exclude_patterns` are skipped here, so they are never counted,
+     * reported or cleaned.
+     *
      * @param  list<string>  $directories
      * @return Generator<int, FileInfo>
      */
     protected function files(string $disk, array $directories): Generator
     {
-        return $this->scanner->files($disk, $directories, $this->trash->excludedPrefixOn($disk));
+        $exclusions = $this->exclusions();
+
+        foreach ($this->scanner->files($disk, $directories, $this->trash->excludedPrefixOn($disk)) as $file) {
+            if ($exclusions->reasonToKeep($file) === null) {
+                yield $file;
+            }
+        }
+    }
+
+    /**
+     * The configured `exclude_paths` and `exclude_patterns`.
+     */
+    protected function exclusions(): ExcludePathFilter
+    {
+        return new ExcludePathFilter(
+            array_values(array_filter((array) $this->config->get('orphan-files.exclude_paths', []), 'is_string')),
+            array_values(array_filter((array) $this->config->get('orphan-files.exclude_patterns', []), 'is_string')),
+            (bool) $this->config->get('orphan-files.case_sensitive', true),
+        );
     }
 
     /**
@@ -501,11 +556,8 @@ class OrphanFiles
         $maxSize = $this->config->get('orphan-files.max_size');
 
         return [
-            new ExcludePathFilter(
-                array_values(array_filter((array) $this->config->get('orphan-files.exclude_paths', []), 'is_string')),
-                array_values(array_filter((array) $this->config->get('orphan-files.exclude_patterns', []), 'is_string')),
-                (bool) $this->config->get('orphan-files.case_sensitive', true),
-            ),
+            // Scans never see excluded files (see files()); this keeps orphan:explain naming the exclusion.
+            $this->exclusions(),
             new GracePeriodFilter($graceMinutes, $referenceTime),
             new FileRuleFilter(
                 is_numeric($minSize) ? (int) $minSize : null,
