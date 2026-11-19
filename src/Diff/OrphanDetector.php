@@ -74,17 +74,31 @@ class OrphanDetector
         })();
 
         foreach (Chunks::of($references, $this->chunkSize()) as $hashes) {
-            $this->index->add($hashes);
+            // spillToDatabase() swaps the index, so read the current one on every chunk.
+            $index = $this->currentIndex();
+            $index->add($hashes);
 
             if ($driver === 'auto'
                 && ! $this->databaseUnavailable
-                && $this->index instanceof MemoryReferenceIndex
-                && $this->index->count() > $this->memoryLimit()) {
-                $this->spillToDatabase($this->index);
+                && $index instanceof MemoryReferenceIndex
+                && $index->count() > $this->memoryLimit()) {
+                $this->spillToDatabase($index);
             }
         }
 
-        return $this->index->count();
+        return $this->currentIndex()->count();
+    }
+
+    /**
+     * @throws LogicException When index() has not built an index yet.
+     */
+    protected function currentIndex(): ReferenceIndex
+    {
+        if ($this->index === null) {
+            throw new LogicException('Build the reference index with index() before classifying files.');
+        }
+
+        return $this->index;
     }
 
     /**
