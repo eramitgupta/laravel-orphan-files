@@ -114,9 +114,7 @@ class DeleteFiles
      */
     protected function deleteFromS3(AwsS3V3Adapter $filesystem, string $disk, array $files): ?array
     {
-        $config = method_exists($filesystem, 'getConfig')
-            ? $filesystem->getConfig()
-            : (array) $this->config->get("filesystems.disks.{$disk}", []);
+        $config = $filesystem->getConfig();
 
         // Read-only disks and disks without a bucket go through the normal adapter, which refuses or handles them.
         if (! empty($config['read-only']) || ! is_string($config['bucket'] ?? null) || $config['bucket'] === '') {
